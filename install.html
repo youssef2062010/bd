@@ -246,7 +246,7 @@
         <span id="btn-install-text">Install App on Phone</span>
       </button>
 
-      <!-- 2. Download / Install App Again Button (تنزيل الأب مرة تانية) -->
+      <!-- 2. Download / Install App Again Button -->
       <button id="btn-download-again" type="button"
         class="w-full py-3.5 px-4 rounded-xl bg-slate-800/90 hover:bg-slate-700/90 active:scale-95 text-slate-100 hover:text-white border border-emerald-500/30 font-bold text-xs sm:text-sm transition-all flex flex-col items-center justify-center gap-0.5 shadow-md">
         <div class="flex items-center gap-2">
@@ -255,10 +255,10 @@
           </svg>
           <span id="btn-download-again-text" class="text-white font-extrabold">Download / Install App Again</span>
         </div>
-        <span class="text-[10px] text-emerald-400/90 font-medium font-sans">تنزيل وتثبيت نسخة جديدة من الأب على الهاتف</span>
+        <span class="text-[10px] text-emerald-400/90 font-medium font-sans">Install another copy or add a new shortcut to Home Screen</span>
       </button>
 
-      <!-- 3. Update Installed App With Latest Changes Button (تحديث الأب الحالي بالتعديلات الجديدة) -->
+      <!-- 3. Update Installed App With Latest Changes Button -->
       <button id="btn-update-app" type="button"
         class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-cyan-600/90 via-blue-600/90 to-indigo-600/90 hover:from-cyan-500 hover:to-indigo-500 active:scale-95 text-white font-bold text-xs sm:text-sm transition-all flex flex-col items-center justify-center gap-0.5 shadow-lg shadow-cyan-950/40 border border-cyan-400/30">
         <div class="flex items-center gap-2">
@@ -267,7 +267,7 @@
           </svg>
           <span id="btn-update-text" class="font-black text-white">Update Installed App with Latest Changes</span>
         </div>
-        <span class="text-[10px] text-cyan-200/90 font-medium font-sans">تحديث الأب الحالي المثبت بآخر التعديلات فوراً</span>
+        <span class="text-[10px] text-cyan-200/90 font-medium font-sans">Sync latest caller info, voice note, and settings immediately</span>
       </button>
 
       <!-- Update Success Toast Banner -->
@@ -449,7 +449,7 @@
       }
     });
 
-    // 2. Download / Install App Again Button (تنزيل الأب مرة تانية)
+    // 2. Download / Install App Again Button
     if (btnDownloadAgain) {
       btnDownloadAgain.addEventListener('click', async () => {
         if (deferredPrompt) {
@@ -465,7 +465,7 @@
       });
     }
 
-    // 3. Update Installed App With Latest Changes (تحديث الأب الحالي بآخر التعديلات)
+    // 3. Update Installed App With Latest Changes
     let isAppUpdated = false;
     if (btnUpdateApp) {
       btnUpdateApp.addEventListener('click', async () => {
