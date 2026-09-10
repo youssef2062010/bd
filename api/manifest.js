@@ -115,9 +115,11 @@ export default async function handler(req, res) {
         }
       ];
 
-  const v = req.query?.v || req.query?.t || dbVersion || '';
-  const manifestId = v ? `/fake-call-app/?v=${v}` : '/fake-call-app/';
-  const startUrl = v ? `/fake-call-app/index.html?mode=standalone&v=${v}` : '/fake-call-app/index.html?mode=standalone';
+  // Canonical stable ID ensures Android/Chrome WebAPK updates the existing installed app
+  // in place instead of creating duplicate app versions on the home screen!
+  const isClone = req.query?.clone === 'true' || req.query?.clone === '1';
+  const manifestId = isClone ? `/fake-call-app/?clone=${Date.now()}` : '/fake-call-app/';
+  const startUrl = '/fake-call-app/index.html?mode=standalone';
 
   return res.status(200).json({
     id: manifestId,

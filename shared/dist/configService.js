@@ -38,6 +38,7 @@ class ServerConfigService {
     pollInFlight = false;
     supabaseClient = null;
     realtimeChannel = null;
+    broadcastChannel = null;
     apiUrl(path = '') {
         const configuredOrigin = import.meta.env?.VITE_CONFIG_API_ORIGIN;
         // Packaged WebViews have a file:// origin and therefore require the deployed API origin.
@@ -51,8 +52,14 @@ class ServerConfigService {
             headers: { 'Cache-Control': 'no-cache, no-store', Pragma: 'no-cache' }
         });
     }
-    publish(config) {
+    publish(config, broadcast = true) {
         this.latest = config;
+        if (broadcast && this.broadcastChannel) {
+            try {
+                this.broadcastChannel.postMessage({ type: 'CONFIG_UPDATED', config });
+            }
+            catch { }
+        }
         this.listeners.forEach((listener) => {
             try {
                 listener(config);
@@ -63,6 +70,20 @@ class ServerConfigService {
         });
     }
     initRealtime() {
+        if (typeof window !== 'undefined' && 'BroadcastChannel' in window && !this.broadcastChannel) {
+            try {
+                this.broadcastChannel = new BroadcastChannel('fakecall_realtime_sync');
+                this.broadcastChannel.onmessage = (event) => {
+                    if (event.data?.type === 'CONFIG_UPDATED' && event.data.config) {
+                        const incoming = normalizeConfig(event.data.config);
+                        if (!this.latest || incoming.version > this.latest.version || incoming.updatedAt > (this.latest.updatedAt || 0)) {
+                            this.publish(incoming, false);
+                        }
+                    }
+                };
+            }
+            catch { }
+        }
         if (this.realtimeChannel || typeof window === 'undefined')
             return;
         try {

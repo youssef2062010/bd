@@ -41,6 +41,7 @@ class ServerConfigService {
   private pollInFlight = false;
   private supabaseClient: SupabaseClient | null = null;
   private realtimeChannel: any = null;
+  private broadcastChannel: BroadcastChannel | null = null;
 
   private apiUrl(path = ''): string {
     const configuredOrigin = (import.meta as any).env?.VITE_CONFIG_API_ORIGIN as string | undefined;
@@ -57,8 +58,13 @@ class ServerConfigService {
     });
   }
 
-  private publish(config: FakeCallConfig): void {
+  private publish(config: FakeCallConfig, broadcast = true): void {
     this.latest = config;
+    if (broadcast && this.broadcastChannel) {
+      try {
+        this.broadcastChannel.postMessage({ type: 'CONFIG_UPDATED', config });
+      } catch {}
+    }
     this.listeners.forEach((listener) => {
       try {
         listener(config);
@@ -69,6 +75,20 @@ class ServerConfigService {
   }
 
   private initRealtime(): void {
+    if (typeof window !== 'undefined' && 'BroadcastChannel' in window && !this.broadcastChannel) {
+      try {
+        this.broadcastChannel = new BroadcastChannel('fakecall_realtime_sync');
+        this.broadcastChannel.onmessage = (event) => {
+          if (event.data?.type === 'CONFIG_UPDATED' && event.data.config) {
+            const incoming = normalizeConfig(event.data.config);
+            if (!this.latest || incoming.version > this.latest.version || incoming.updatedAt > (this.latest.updatedAt || 0)) {
+              this.publish(incoming, false);
+            }
+          }
+        };
+      } catch {}
+    }
+
     if (this.realtimeChannel || typeof window === 'undefined') return;
     try {
       const url =

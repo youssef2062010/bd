@@ -12,18 +12,6 @@
   <meta name="theme-color" content="#040711" />
   <title>Mobile Installation</title>
   <link id="app-manifest" rel="manifest" href="/api/manifest" />
-  <script>
-    (function() {
-      try {
-        var params = new URLSearchParams(window.location.search);
-        var v = params.get('v');
-        var manifestEl = document.getElementById('app-manifest');
-        if (manifestEl && v) {
-          manifestEl.href = '/api/manifest?v=' + encodeURIComponent(v);
-        }
-      } catch (e) {}
-    })();
-  </script>
   <link rel="apple-touch-icon" sizes="180x180" href="/api/branding/icon" />
   <link rel="apple-touch-icon" href="/api/branding/icon" />
   <link rel="apple-touch-icon-precomposed" href="/api/branding/icon" />
@@ -271,11 +259,11 @@
       </button>
 
       <!-- Update Success Toast Banner -->
-      <div id="update-success-banner" class="hidden w-full bg-emerald-950/90 border border-emerald-400/50 rounded-xl p-3 text-left items-center gap-2.5 pop-in">
+      <div id="update-success-banner" class="hidden w-full bg-emerald-950/90 border border-emerald-400/50 rounded-xl p-3.5 text-left items-center gap-3 pop-in">
         <div class="w-8 h-8 rounded-lg bg-emerald-500 text-slate-950 flex items-center justify-center shrink-0 font-black text-base">✓</div>
         <div class="flex-1 min-w-0">
-          <div class="text-xs font-bold text-white">App Updated Successfully!</div>
-          <div class="text-[10px] text-emerald-200 leading-tight">All latest caller details, audio, and settings synced to your phone.</div>
+          <div class="text-xs font-bold text-white">Existing Installed App Updated!</div>
+          <div class="text-[10px] text-emerald-200 leading-tight">Your installed app has received all latest changes. No second version was installed!</div>
         </div>
       </div>
 
@@ -347,9 +335,7 @@
 
       const manifestLink = document.getElementById('app-manifest') || document.querySelector('link[rel="manifest"]');
       if (manifestLink) {
-        const urlParams = new URLSearchParams(window.location.search);
-        const v = urlParams.get('v') || b.version || b.updatedAt || Date.now();
-        manifestLink.href = '/api/manifest?v=' + encodeURIComponent(v) + '&t=' + Date.now();
+        manifestLink.href = '/api/manifest?t=' + Date.now();
       }
 
       const iconLinks = document.querySelectorAll('link[rel*="icon"]');
@@ -522,14 +508,23 @@
             applyBranding(brandData);
           }
 
-          // Step E: Update UI to success state
+          // Step E: Broadcast to any open PWA windows or browser tabs
+          if ('BroadcastChannel' in window && cfgData?.config) {
+            try {
+              const bc = new BroadcastChannel('fakecall_realtime_sync');
+              bc.postMessage({ type: 'CONFIG_UPDATED', config: cfgData.config });
+              setTimeout(() => bc.close(), 1000);
+            } catch {}
+          }
+
+          // Step F: Update UI to success state
           if (updateSpinner) updateSpinner.classList.remove('animate-spin');
           if (updateSuccessBanner) {
             updateSuccessBanner.classList.remove('hidden');
             updateSuccessBanner.classList.add('flex');
           }
           if (btnUpdateText) {
-            btnUpdateText.textContent = '✓ Updated! Tap to Open Updated App Now';
+            btnUpdateText.textContent = '✓ Updated! Launch Existing App';
           }
           isAppUpdated = true;
           headerStatus.textContent = 'UPDATED ✓';

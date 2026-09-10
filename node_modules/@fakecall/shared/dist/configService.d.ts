@@ -17,6 +17,7 @@ declare class ServerConfigService {
     private pollInFlight;
     private supabaseClient;
     private realtimeChannel;
+    private broadcastChannel;
     private apiUrl;
     private request;
     private publish;
