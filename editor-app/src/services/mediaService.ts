@@ -85,6 +85,7 @@ class MediaService {
       });
       return result.url;
     } catch (clientErr) {
+      console.warn('Client upload failed, attempting fallback:', clientErr);
       // Fallback: base64 JSON upload for local dev or small files
       try {
         const dataUrl = await new Promise<string>((resolve, reject) => {
@@ -106,8 +107,10 @@ class MediaService {
           throw new Error(payload.error || `Upload failed (${response.status})`);
         }
         return payload.url;
-      } catch {
-        throw new Error('Upload failed. Check your connection and try again. The previous file has been kept.');
+      } catch (fallbackErr: any) {
+        console.error('All upload methods failed:', { clientErr, fallbackErr });
+        const msg = fallbackErr?.message || (clientErr instanceof Error ? clientErr.message : 'Upload failed');
+        throw new Error(msg || 'Upload failed. Check your connection and try again.');
       }
     }
   }
