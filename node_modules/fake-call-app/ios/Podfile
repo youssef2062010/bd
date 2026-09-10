@@ -1,0 +1,6 @@
+platform :ios, '14.0'
+use_frameworks!
+
+target 'FakeCallApp' do
+  # CocoaPods dependencies for Fake Call App
+end

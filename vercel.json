@@ -1,0 +1,102 @@
+{
+  "name": "didas-birthday",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "cleanUrls": false,
+  "redirects": [
+    {
+      "source": "/editor-app",
+      "destination": "/admin",
+      "permanent": false
+    },
+    {
+      "source": "/editor-app/",
+      "destination": "/admin",
+      "permanent": false
+    },
+    {
+      "source": "/editor-app/index.html",
+      "destination": "/admin",
+      "permanent": false
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/install",
+      "destination": "/install.html"
+    },
+    {
+      "source": "/install-admin",
+      "destination": "/install-admin.html"
+    },
+    {
+      "source": "/app",
+      "destination": "/fake-call-app/index.html"
+    },
+    {
+      "source": "/admin",
+      "destination": "/editor-app/index.html"
+    },
+    {
+      "source": "/editor",
+      "destination": "/editor-app/index.html"
+    },
+    {
+      "source": "/editor.html",
+      "destination": "/editor-app/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, no-cache, must-revalidate, proxy-revalidate"
+        },
+        {
+          "key": "Pragma",
+          "value": "no-cache"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization, Cache-Control, Pragma"
+        }
+      ]
+    },
+    {
+      "source": "/sw.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        },
+        {
+          "key": "Service-Worker-Allowed",
+          "value": "/"
+        }
+      ]
+    },
+    {
+      "source": "/manifest.json",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/manifest+json"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
+      ]
+    }
+  ]
+}

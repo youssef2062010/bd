@@ -1,0 +1,13 @@
+{
+  "id": "/editor-app/",
+  "name": "Fake Call Studio Admin",
+  "short_name": "Call Admin",
+  "description": "Control Center and Settings for Fake Call App",
+  "start_url": "/editor-app/index.html?mode=standalone",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#060911",
+  "theme_color": "#060911",
+  "icons": []
+}

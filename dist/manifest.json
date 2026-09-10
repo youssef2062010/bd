@@ -1,0 +1,18 @@
+{
+  "id": "/fake-call-app/",
+  "name": "Fake Call",
+  "short_name": "Fake Call",
+  "description": "Incoming Call Phone Simulator",
+  "start_url": "/fake-call-app/index.html?mode=standalone",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": [
+    "standalone",
+    "window-controls-overlay"
+  ],
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "orientation": "portrait",
+  "prefer_related_applications": false,
+  "icons": []
+}

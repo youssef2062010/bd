@@ -1,0 +1,17 @@
+{
+  "name": "@fakecall/shared",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Shared models, defaults, and offline storage contracts for Fake Call Simulator",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.116.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}

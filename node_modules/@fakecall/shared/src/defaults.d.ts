@@ -1,0 +1,10 @@
+import { FakeCallConfig, RingtoneConfig } from './types.js';
+/**
+ * High-definition crisp SVG avatar data URI for default caller photo.
+ * Ensures 100% offline rendering without any external image dependencies.
+ */
+export declare const DEFAULT_CALLER_AVATAR = "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 240 240\" width=\"240\" height=\"240\"><defs><linearGradient id=\"grad\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"%233b82f6\"/><stop offset=\"50%\" stop-color=\"%236366f1\"/><stop offset=\"100%\" stop-color=\"%238b5cf6\"/></linearGradient><linearGradient id=\"skin\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"%23fcd34d\"/><stop offset=\"100%\" stop-color=\"%23f59e0b\"/></linearGradient></defs><rect width=\"240\" height=\"240\" rx=\"120\" fill=\"url(%23grad)\"/><circle cx=\"120\" cy=\"92\" r=\"42\" fill=\"url(%23skin)\"/><path d=\"M120 54c-22 0-38 14-38 32 0 4 2 8 5 11 3-12 14-21 28-21s26 9 28 21c3-3 5-7 5-11 0-18-16-32-38-32z\" fill=\"%231e293b\"/><path d=\"M120 148c-38 0-70 20-80 50 16 26 46 42 80 42s64-16 80-42c-10-30-42-50-80-50z\" fill=\"%230f172a\"/><circle cx=\"106\" cy=\"92\" r=\"4\" fill=\"%231e293b\"/><circle cx=\"134\" cy=\"92\" r=\"4\" fill=\"%231e293b\"/><path d=\"M112 110q8 6 16 0\" stroke=\"%23b45309\" stroke-width=\"2.5\" stroke-linecap=\"round\" fill=\"none\"/></svg>";
+export declare const RINGTONE_PRESETS: RingtoneConfig[];
+export declare const DEFAULT_SPEECH_TEXT = "Hey, can you hear me? Ahmed here! Listen, we are downstairs waiting by the lobby. We really need to head out for the meeting right now, so please wrap up whatever you're doing and come down quickly. Let me know when you're in the elevator. Talk to you in a minute!";
+export declare const DEFAULT_CONFIG: FakeCallConfig;
+//# sourceMappingURL=defaults.d.ts.map

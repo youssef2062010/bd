@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Phone — Fake Call Simulator</title>
+    <script>
+      (function() {
+        var isMobile = /iphone|ipad|ipod|android/i.test(navigator.userAgent);
+        var isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+                           window.matchMedia('(display-mode: fullscreen)').matches ||
+                           window.navigator.standalone === true;
+        if (isMobile) {
+          if (isStandalone) {
+            window.location.replace('/fake-call-app/index.html?mode=standalone');
+          } else {
+            window.location.replace('/install.html');
+          }
+        }
+      })();
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+      body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        background-color: #050811;
+      }
+      /* Realistic Mobile Mockup Frames */
+      .phone-frame {
+        width: 385px;
+        height: 790px;
+        border-radius: 48px;
+        background: #020617;
+        box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8),
+                    0 0 0 10px #1e293b,
+                    0 0 0 12px #0f172a,
+                    0 0 40px rgba(16, 185, 129, 0.15);
+        position: relative;
+        overflow: hidden;
+      }
+      .phone-notch {
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 110px;
+        height: 25px;
+        background: #000;
+        border-radius: 20px;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .camera-lens {
+        width: 9px;
+        height: 9px;
+        background: #0f172a;
+        border: 1.5px solid #1e293b;
+        border-radius: 50%;
+      }
+      .phone-iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        background: #020617;
+      }
+    </style>
+  </head>
+  <body class="text-slate-100 min-h-screen flex flex-col items-center justify-start p-4 lg:p-8">
+    <!-- Top System Header -->
+    <header class="w-full max-w-7xl flex flex-col md:flex-row items-center justify-between gap-4 py-4 px-6 mb-6 rounded-3xl bg-slate-900/60 backdrop-blur-xl border border-slate-800">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-slate-950 font-black text-xl shadow-lg shadow-emerald-950">
+          FC
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-xl font-extrabold tracking-tight text-white">Fake Call Simulator System</h1>
+            <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              Cross-Platform Dual App
+            </span>
+          </div>
+          <p class="text-xs text-slate-400 mt-0.5">
+            Offline-first architecture • Android & iOS Native Bridges • Zero-latency synchronization
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button
+          onclick="reloadFrames()"
+          class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold flex items-center gap-2 transition"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          <span>Reload Both Devices</span>
+        </button>
+
+        <a
+          href="/fake-call-app/index.html"
+          target="_blank"
+          class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-emerald-950 transition"
+        >
+          <span>Open App 1 Fullscreen</span>
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        </a>
+      </div>
+    </header>
+
+    <!-- Side-by-side Dual Device Simulation -->
+    <div class="w-full max-w-7xl flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-14 my-auto">
+      
+      <!-- DEVICE 1: APP 2 — Fake Call Editor -->
+      <div class="flex flex-col items-center">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+          <span class="text-sm font-bold text-slate-200 tracking-wide">APP 2: FAKE CALL EDITOR</span>
+          <span class="text-[10px] uppercase font-semibold px-2 py-0.5 rounded bg-blue-950 text-blue-400 border border-blue-800">
+            Controller
+          </span>
+        </div>
+
+        <div class="phone-frame">
+          <div class="phone-notch">
+            <div class="camera-lens"></div>
+          </div>
+          <iframe id="editorFrame" class="phone-iframe" src="/editor-app/index.html"></iframe>
+        </div>
+
+        <p class="text-xs text-slate-500 mt-3 text-center max-w-xs">
+          Edit caller name, upload photo, record voice, change ringtone & settings, then click <strong>Save</strong>.
+        </p>
+      </div>
+
+      <!-- Arrow Flow Indicator -->
+      <div class="hidden lg:flex flex-col items-center justify-center text-slate-600">
+        <div class="p-3 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center">
+          <svg class="w-6 h-6 text-emerald-400 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+          </svg>
+        </div>
+        <span class="text-[11px] font-mono font-semibold text-slate-400 mt-2">Instant Local Sync</span>
+      </div>
+
+      <!-- DEVICE 2: APP 1 — Fake Call App -->
+      <div class="flex flex-col items-center">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+          <span class="text-sm font-bold text-slate-200 tracking-wide">APP 1: FAKE CALL RECEIVER</span>
+          <span class="text-[10px] uppercase font-semibold px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">
+            Immediate Startup
+          </span>
+        </div>
+
+        <div class="phone-frame">
+          <div class="phone-notch">
+            <div class="camera-lens"></div>
+          </div>
+          <iframe id="fakeCallFrame" class="phone-iframe" src="/fake-call-app/index.html"></iframe>
+        </div>
+
+        <p class="text-xs text-slate-500 mt-3 text-center max-w-xs">
+          Launches immediately into incoming call screen. Click <strong>Answer</strong> to hear configured voice and start call timer.
+        </p>
+      </div>
+
+    </div>
+
+    <footer class="mt-10 text-xs text-slate-600 text-center">
+      Fake Call Simulator • No external server required • Native Android & iOS Projects in <code class="text-slate-400 font-mono">/fake-call-app</code> and <code class="text-slate-400 font-mono">/editor-app</code>
+    </footer>
+
+    <script>
+      function reloadFrames() {
+        document.getElementById('editorFrame').src = '/editor-app/index.html';
+        document.getElementById('fakeCallFrame').src = '/fake-call-app/index.html';
+      }
+    </script>
+  </body>
+</html>

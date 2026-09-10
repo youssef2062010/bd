@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Mobile Installation" />
+  <meta name="theme-color" content="#040711" />
+  <title>Mobile Installation</title>
+  <link rel="manifest" href="/api/manifest" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #040711;
+      color: #ffffff;
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
+    }
+
+    .ambient-glow {
+      background: radial-gradient(circle at 50% 15%, rgba(16, 185, 129, 0.25), transparent 60%),
+        radial-gradient(circle at 80% 85%, rgba(99, 102, 241, 0.18), transparent 50%);
+    }
+
+    @keyframes pulseGlow {
+
+      0%,
+      100% {
+        transform: scale(1);
+        box-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
+      }
+
+      50% {
+        transform: scale(1.04);
+        box-shadow: 0 0 50px rgba(16, 185, 129, 0.75);
+      }
+    }
+
+    .pulse-glow {
+      animation: pulseGlow 2.4s ease-in-out infinite;
+    }
+
+    @keyframes floatSlow {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-6px);
+      }
+    }
+
+    .float-slow {
+      animation: floatSlow 3.2s ease-in-out infinite;
+    }
+
+    @keyframes popIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+
+      70% {
+        transform: scale(1.03);
+      }
+
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .pop-in {
+      animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @keyframes checkStroke {
+      0% {
+        stroke-dashoffset: 50;
+      }
+
+      100% {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    .draw-check {
+      stroke-dasharray: 50;
+      stroke-dashoffset: 50;
+      animation: checkStroke 0.6s ease-out 0.2s forwards;
+    }
+  </style>
+</head>
+
+<body class="ambient-glow flex flex-col items-center justify-between p-5 select-none overflow-x-hidden">
+
+  <script>
+    // 1. If already launched in standalone mode from home screen, redirect immediately to call view
+    const isStandalone =
+      window.matchMedia('(display-mode: standalone)').matches ||
+      window.matchMedia('(display-mode: fullscreen)').matches ||
+      window.navigator.standalone === true ||
+      window.location.search.includes('mode=standalone');
+
+    if (isStandalone) {
+      window.location.replace('/fake-call-app/index.html?mode=standalone');
+    }
+
+    // 2. Pre-register Service Worker for instant offline WebAPK caching
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch((err) => {
+          console.warn('ServiceWorker registration:', err);
+        });
+      });
+    }
+  </script>
+
+  <!-- Top In-App Browser Banner (shown if opened from WhatsApp, Instagram, Telegram, Messenger) -->
+  <div id="inapp-warning"
+    class="hidden w-full max-w-sm mb-3 bg-amber-500/15 border border-amber-500/40 rounded-2xl p-3 text-left flex items-start gap-2.5 shadow-lg">
+    <div class="text-amber-400 text-lg shrink-0 mt-0.5">⚠️</div>
+    <div class="text-xs text-amber-200">
+      <div class="font-bold text-amber-100 mb-0.5">In-App Browser Detected</div>
+      <span>To install the app directly on your phone, tap the <strong>3 dots (⋮)</strong> or <strong>Share</strong>
+        button and choose <strong>"Open in Chrome"</strong> or <strong>"Open in Safari"</strong>.</span>
+    </div>
+  </div>
+
+  <!-- Header Badge -->
+  <header class="w-full max-w-sm flex items-center justify-between pt-2 pb-2">
+    <div class="flex items-center gap-2">
+      <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+      <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Mobile Application</span>
+    </div>
+    <span id="header-status"
+      class="text-[11px] font-mono font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 px-2.5 py-0.5 rounded-full">
+      Ready to Install
+    </span>
+  </header>
+
+  <!-- Main Container -->
+  <main class="w-full max-w-sm flex flex-col items-center text-center my-auto py-3">
+
+    <!-- APP ICON -->
+    <div class="relative mb-5 float-slow">
+      <div
+        class="w-28 h-28 rounded-3xl overflow-hidden shadow-2xl p-1 bg-gradient-to-tr from-emerald-500 via-teal-400 to-cyan-300 pulse-glow">
+        <img id="app-icon-img" alt="App Icon" style="display:none" class="w-full h-full rounded-[22px] object-cover" />
+      </div>
+    </div>
+
+    <!-- TITLE & SUBTITLE -->
+    <h1 id="app-title" class="text-3xl font-black text-white tracking-tight mb-1">Mobile App</h1>
+    <p id="app-tagline" class="text-xs text-slate-400 font-medium mb-5">
+      Incoming Call Simulator • Fullscreen Mobile App
+    </p>
+
+    <!-- INSTALLATION CARD -->
+    <div id="install-card"
+      class="w-full bg-slate-900/90 border border-white/10 rounded-2xl p-5 shadow-2xl flex flex-col gap-4">
+
+      <!-- Feature Badges -->
+      <div class="grid grid-cols-2 gap-2 text-left">
+        <div class="bg-slate-800/80 border border-white/5 rounded-xl p-2.5 flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <div>
+            <div class="text-[11px] font-bold text-white leading-tight">Standalone App</div>
+            <div class="text-[9px] text-slate-400">No Chrome badge</div>
+          </div>
+        </div>
+
+        <div class="bg-slate-800/80 border border-white/5 rounded-xl p-2.5 flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <div>
+            <div class="text-[11px] font-bold text-white leading-tight">Fullscreen</div>
+            <div class="text-[9px] text-slate-400">No browser URL bar</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Native Install Button -->
+      <button id="btn-install" type="button"
+        class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 active:scale-95 text-slate-950 font-black text-base shadow-xl shadow-emerald-500/35 transition-all flex items-center justify-center gap-2.5">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+        </svg>
+        <span id="btn-install-text">Install App on Phone</span>
+      </button>
+
+      <!-- Instant Direct Launch Button -->
+      <a id="btn-open-direct" href="/fake-call-app/index.html?mode=standalone"
+        class="w-full py-3.5 px-4 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 hover:text-white text-xs font-bold transition flex items-center justify-center gap-2 border border-white/10">
+        <svg class="w-4 h-4 text-emerald-400" fill="currentColor" viewBox="0 0 24 24">
+          <path
+            d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.11-.21c1.12.45 2.33.69 3.58.69a1 1 0 011 1v3.5a1 1 0 01-1 1A17.93 17.93 0 012 5a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.24 2.45.69 3.57a1 1 0 01-.21 1.12l-2.36 2.1z" />
+        </svg>
+        <span>Launch Call Simulator Directly (Instant)</span>
+      </a>
+
+      <!-- Step-by-Step Instructions Box -->
+      <div id="instructions-box"
+        class="w-full bg-slate-950/80 border border-white/5 rounded-xl p-3.5 text-left text-xs flex flex-col gap-2.5">
+        <!-- Dynamically filled for Android / iOS in English -->
+      </div>
+
+    </div>
+
+    <!-- INSTALLED SUCCESS CARD -->
+    <div id="installed-card"
+      class="w-full bg-emerald-950/40 border-2 border-emerald-500/50 rounded-3xl p-6 shadow-2xl hidden flex-col items-center text-center gap-4 pop-in">
+
+      <div class="relative flex items-center justify-center">
+        <div class="absolute -inset-2 rounded-full bg-emerald-500/30 animate-ping"></div>
+        <div
+          class="relative w-20 h-20 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 flex items-center justify-center shadow-2xl shadow-emerald-500/50">
+          <svg class="w-10 h-10 text-slate-950 stroke-[3.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path class="draw-check" stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+      </div>
+
+      <div class="flex flex-col items-center">
+        <span class="text-3xl font-black text-white tracking-tight">Installed Successfully!</span>
+        <span class="text-xs font-bold text-emerald-400 mt-1">App is now on your phone's Home Screen</span>
+      </div>
+
+      <p class="text-xs text-slate-300 leading-relaxed">
+        Phone App is now installed as an independent mobile application. You can find it in your phone's App Drawer and
+        Home Screen.
+      </p>
+
+      <a href="/fake-call-app/index.html?mode=standalone"
+        class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 active:scale-95 text-slate-950 font-black text-base shadow-xl shadow-emerald-500/40 transition-all flex items-center justify-center gap-2">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+          <path
+            d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.11-.21c1.12.45 2.33.69 3.58.69a1 1 0 011 1v3.5a1 1 0 01-1 1A17.93 17.93 0 012 5a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.24 2.45.69 3.57a1 1 0 01-.21 1.12l-2.36 2.1z" />
+        </svg>
+        <span>Open Phone App Now</span>
+      </a>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="w-full max-w-sm pb-2 text-center text-[11px] text-slate-500">
+    <span>Standalone Mobile Application (WebAPK) • No Browser Controls</span>
+  </footer>
+
+  <!-- Controller Script -->
+  <script>
+    const ua = navigator.userAgent.toLowerCase();
+    const isIos = /iphone|ipad|ipod/.test(ua);
+    const isAndroid = /android/.test(ua);
+
+    // Detect In-App Browsers (WhatsApp, Instagram, FB, Telegram, Messenger)
+    const isInApp = /fban|fbav|instagram|whatsapp|line|twitter|telegram/i.test(navigator.userAgent);
+    if (isInApp) {
+      document.getElementById('inapp-warning')?.classList.remove('hidden');
+    }
+
+    const installCard = document.getElementById('install-card');
+    const installedCard = document.getElementById('installed-card');
+    const btnInstall = document.getElementById('btn-install');
+    const btnInstallText = document.getElementById('btn-install-text');
+    const headerStatus = document.getElementById('header-status');
+    const instructionsBox = document.getElementById('instructions-box');
+    const appTitle = document.getElementById('app-title');
+    const appIconImg = document.getElementById('app-icon-img');
+
+    let deferredPrompt = null;
+
+    // Dynamic Live Branding
+    try {
+      const cached = localStorage.getItem('app_branding_cache');
+      if (cached) {
+        const b = JSON.parse(cached);
+        if (b.appName && appTitle) appTitle.textContent = b.appName;
+        if (b.appIconUrl && appIconImg) appIconImg.src = b.appIconUrl;
+      }
+    } catch (e) { }
+
+    fetch('/api/branding')
+      .then((r) => r.json())
+      .then((b) => {
+        if (b && b.appName) {
+          localStorage.setItem('app_branding_cache', JSON.stringify(b));
+          if (appTitle) appTitle.textContent = b.appName;
+          const finalIcon = b.appIconUrl || '';
+          if (appIconImg) {
+            appIconImg.src = finalIcon;
+            appIconImg.style.display = finalIcon ? '' : 'none';
+          }
+          document.title = b.appName + ' — Mobile Installation';
+          document.querySelector('meta[name="apple-mobile-web-app-title"]')?.setAttribute('content', b.appName);
+          const iconLinks = document.querySelectorAll('link[rel="icon"], link[rel="apple-touch-icon"]');
+          iconLinks.forEach((l) => {
+            if (finalIcon) l.href = finalIcon;
+            else l.removeAttribute('href');
+          });
+        }
+      })
+      .catch(() => { });
+
+    // Device-Specific Instructions (100% English)
+    if (isIos) {
+      btnInstall.classList.add('hidden'); // iOS Safari requires Share -> Add to Home Screen
+      instructionsBox.innerHTML = `
+        <div class="font-bold text-white flex items-center gap-1.5 pb-1 border-b border-white/10">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span>How to Install on iPhone / iPad (Safari):</span>
+        </div>
+        <div class="flex items-start gap-2.5">
+          <span class="w-5 h-5 rounded-full bg-emerald-500 text-slate-950 font-black text-xs flex items-center justify-center shrink-0">1</span>
+          <span class="text-slate-200">Tap the <strong>Share</strong> button at the bottom of Safari <strong class="inline-block bg-white/10 px-1.5 py-0.5 rounded text-emerald-300 font-mono">[↑]</strong>.</span>
+        </div>
+        <div class="flex items-start gap-2.5">
+          <span class="w-5 h-5 rounded-full bg-emerald-500 text-slate-950 font-black text-xs flex items-center justify-center shrink-0">2</span>
+          <span class="text-slate-200">Scroll down and tap <strong class="text-white">"Add to Home Screen"</strong> <strong class="inline-block bg-white/10 px-1.5 py-0.5 rounded text-emerald-300 font-bold">[+]</strong>.</span>
+        </div>
+        <div class="flex items-start gap-2.5">
+          <span class="w-5 h-5 rounded-full bg-emerald-500 text-slate-950 font-black text-xs flex items-center justify-center shrink-0">3</span>
+          <span class="text-slate-200">Tap <strong class="text-white">"Add"</strong> in the top-right corner.</span>
+        </div>
+        <div class="pt-1.5 border-t border-white/10 text-[11px] text-emerald-300 font-semibold">
+          ✓ The app icon appears on your iPhone Home Screen and opens full-screen without Safari toolbars!
+        </div>
+      `;
+    } else {
+      instructionsBox.innerHTML = `
+        <div class="font-bold text-white flex items-center gap-1.5 pb-1 border-b border-white/10">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span>How to Install as a Native App on Android:</span>
+        </div>
+        <div class="flex items-start gap-2">
+          <span class="w-5 h-5 rounded-full bg-emerald-500 text-slate-950 font-black text-xs flex items-center justify-center shrink-0">1</span>
+          <span class="text-slate-200">Tap the <strong>"Install App on Phone"</strong> button above.</span>
+        </div>
+        <div class="flex items-start gap-2">
+          <span class="w-5 h-5 rounded-full bg-emerald-500 text-slate-950 font-black text-xs flex items-center justify-center shrink-0">2</span>
+          <span class="text-slate-200">In the prompt dialog, tap <strong>"Install"</strong>.</span>
+        </div>
+        <div class="pt-1 border-t border-white/10 text-[11px] text-slate-300">
+          💡 <strong>If no prompt appears:</strong> Tap Chrome's menu <strong>(3 dots ⋮ in top-right)</strong> and select <strong>"Install app"</strong> (or "Add to Home screen").
+        </div>
+        <div class="pt-1 border-t border-white/10 text-[11px] text-emerald-300 font-semibold">
+          ✓ Installs directly into your phone's App Drawer and Home Screen without any Chrome badge.
+        </div>
+      `;
+    }
+
+    // Capture the native install prompt event
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      btnInstall.classList.remove('hidden');
+      headerStatus.textContent = 'READY';
+      btnInstallText.textContent = 'Install App on Phone Now';
+    });
+
+    // Tap Install Button
+    btnInstall.addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          showInstalledView();
+        }
+        deferredPrompt = null;
+      } else {
+        // Fallback for when beforeinstallprompt has not fired or browser is in a custom state
+        alert('To install Phone App on your mobile device:\n\n1. Tap the 3 dots menu (⋮) in your browser\n2. Select "Install app" (or "Add to Home screen")\n\nThe app will install directly to your phone.');
+      }
+    });
+
+    function showInstalledView() {
+      installCard.classList.add('hidden');
+      installedCard.classList.remove('hidden');
+      installedCard.classList.add('flex');
+      headerStatus.textContent = 'INSTALLED';
+      headerStatus.className = 'text-[11px] font-mono font-bold text-slate-950 bg-emerald-400 px-3 py-0.5 rounded-full shadow-md shadow-emerald-500/30';
+      localStorage.setItem('fake_call_pwa_installed', 'true');
+    }
+
+    // Detect when installation finishes
+    window.addEventListener('appinstalled', () => {
+      showInstalledView();
+    });
+
+    // Check if already installed
+    if (localStorage.getItem('fake_call_pwa_installed') === 'true') {
+      showInstalledView();
+    }
+  </script>
+
+</body>
+
+</html>

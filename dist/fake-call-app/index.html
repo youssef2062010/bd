@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Fake Call" />
+  <meta name="theme-color" content="#000000" />
+  <title>Fake Call</title>
+  <link rel="manifest" href="/api/manifest" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            slate: {
+              750: '#293548',
+              850: '#172033',
+              950: '#020617'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <script type="module" crossorigin src="../assets/fakeCallApp-BTc5j-jl.js"></script>
+  <link rel="modulepreload" crossorigin href="../assets/volume-2-DNBqts04.js">
+  <link rel="stylesheet" crossorigin href="../assets/fakeCallApp-BjMR80Iv.css">
+</head>
+
+<body class="bg-slate-950 text-white select-none">
+  <div id="root"></div>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => { });
+      });
+    }
+  </script>
+</body>
+
+</html>

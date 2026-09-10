@@ -1,0 +1,51 @@
+{
+  "callerName": "Ahmed Mohamed",
+  "callerPhone": "+20 10 1234 5678",
+  "callerImage": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 240 240\" width=\"240\" height=\"240\"><defs><linearGradient id=\"grad\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"%233b82f6\"/><stop offset=\"50%\" stop-color=\"%236366f1\"/><stop offset=\"100%\" stop-color=\"%238b5cf6\"/></linearGradient><linearGradient id=\"skin\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"%23fcd34d\"/><stop offset=\"100%\" stop-color=\"%23f59e0b\"/></linearGradient></defs><rect width=\"240\" height=\"240\" rx=\"120\" fill=\"url(%23grad)\"/><circle cx=\"120\" cy=\"92\" r=\"42\" fill=\"url(%23skin)\"/><path d=\"M120 54c-22 0-38 14-38 32 0 4 2 8 5 11 3-12 14-21 28-21s26 9 28 21c3-3 5-7 5-11 0-18-16-32-38-32z\" fill=\"%231e293b\"/><path d=\"M120 148c-38 0-70 20-80 50 16 26 46 42 80 42s64-16 80-42c-10-30-42-50-80-50z\" fill=\"%230f172a\"/><circle cx=\"106\" cy=\"92\" r=\"4\" fill=\"%231e293b\"/><circle cx=\"134\" cy=\"92\" r=\"4\" fill=\"%231e293b\"/><path d=\"M112 110q8 6 16 0\" stroke=\"%23b45309\" stroke-width=\"2.5\" stroke-linecap=\"round\" fill=\"none\"/></svg>",
+  "voiceAudio": {
+    "uri": "synth:default-speech",
+    "name": "Ahmed Greeting (Urgent Meeting)",
+    "durationMs": 12000,
+    "mimeType": "audio/synthetic",
+    "peaks": [
+      0.3,
+      0.6,
+      0.8,
+      0.4,
+      0.9,
+      0.7,
+      0.5,
+      0.8,
+      0.3,
+      0.9,
+      0.6,
+      0.4,
+      0.2
+    ]
+  },
+  "ringtone": {
+    "id": "modern",
+    "name": "Modern Smartphone (Marimba)",
+    "uri": "synth:modern",
+    "enabled": true,
+    "volume": 0.85
+  },
+  "callSettings": {
+    "autoAnswerDelaySeconds": 0,
+    "callDuration": 60,
+    "autoEndWhenAudioFinishes": true,
+    "vibrationEnabled": true,
+    "animationStyle": "pulse",
+    "theme": "romantic",
+    "fallingHeartsEnabled": true,
+    "uiStyle": "ios",
+    "answerMethod": "buttons",
+    "realisticVoiceFilter": true,
+    "autoRecordCalls": true
+  },
+  "branding": {
+    "appDisplayName": "Dida",
+    "appIcon": "phone-classic"
+  },
+  "updatedAt": 1789014406474
+}
