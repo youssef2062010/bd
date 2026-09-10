@@ -79,7 +79,7 @@ export const IosCallControls: React.FC<IosCallControlsProps> = ({
             <PhoneAcceptGlyph className="w-8 h-8 sm:w-9 sm:h-9 text-white drop-shadow-md relative z-10" />
           </button>
           <span className="text-[14px] font-normal text-white tracking-tight drop-shadow-sm">
-            Accept
+            Answer
           </span>
         </div>
       </div>

@@ -10,19 +10,27 @@ import { hapticService } from './services/hapticService';
 import { deviceTrackerService } from './services/deviceTrackerService';
 
 export function App() {
-  const [config, setConfig] = useState<FakeCallConfig>(DEFAULT_CONFIG);
+  const [config, setConfig] = useState<FakeCallConfig>(() => {
+    try {
+      const cached = localStorage.getItem('fakecall_config_cache');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed && typeof parsed === 'object') return parsed;
+      }
+    } catch { }
+    return DEFAULT_CONFIG;
+  });
   const [callState, setCallState] = useState<CallState>('incoming');
   const [callDuration, setCallDuration] = useState(0);
   const [voiceProgress, setVoiceProgress] = useState({ current: 0, total: 0 });
-  const [isLoadingConfig, setIsLoadingConfig] = useState(true);
+  const [isLoadingConfig, setIsLoadingConfig] = useState(false);
   const [configError, setConfigError] = useState<string | null>(null);
-
 
   const activeCallStartTime = useRef<number | null>(null);
   const maxDurationTimerRef = useRef<number | null>(null);
   const callStateRef = useRef<CallState>('incoming');
   const autoAnswerTimerRef = useRef<number | null>(null);
-  const configRef = useRef<FakeCallConfig>(DEFAULT_CONFIG);
+  const configRef = useRef<FakeCallConfig>(config);
 
   useEffect(() => {
     callStateRef.current = callState;
@@ -67,16 +75,26 @@ export function App() {
     let mounted = true;
     const configId = new URLSearchParams(window.location.search).get('configId') || 'main';
 
+    // Start incoming call on mount immediately with cached/default config
+    startIncomingCall(configRef.current);
+
     const init = async () => {
       try {
         const latest = await configService.getConfig(configId);
         if (mounted) {
+          try {
+            localStorage.setItem('fakecall_config_cache', JSON.stringify(latest));
+          } catch { }
           setConfig(latest);
           configRef.current = latest;
-          startIncomingCall(latest);
+          if (callStateRef.current === 'incoming') {
+            startIncomingCall(latest);
+          }
         }
       } catch (e) {
-        if (mounted) setConfigError(e instanceof Error ? e.message : 'Could not load this call configuration.');
+        if (mounted && !configRef.current) {
+          setConfigError(e instanceof Error ? e.message : 'Could not load this call configuration.');
+        }
       } finally {
         if (mounted) setIsLoadingConfig(false);
       }
