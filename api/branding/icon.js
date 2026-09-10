@@ -11,6 +11,19 @@ export default async function iconHandler(req, res) {
     try {
       const branding = await readBranding();
       if (typeof branding.appIconUrl === 'string' && /^https?:\/\//i.test(branding.appIconUrl)) {
+        try {
+          const imgRes = await fetch(branding.appIconUrl);
+          if (imgRes.ok) {
+            const buffer = Buffer.from(await imgRes.arrayBuffer());
+            const contentType = imgRes.headers.get('content-type') || 'image/jpeg';
+            res.setHeader('Content-Type', contentType);
+            res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+            res.setHeader('Access-Control-Allow-Origin', '*');
+            return res.status(200).send(buffer);
+          }
+        } catch {
+          // fallback if proxy fails
+        }
         res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
         return res.redirect(307, branding.appIconUrl);
       }
