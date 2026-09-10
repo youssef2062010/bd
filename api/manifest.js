@@ -44,14 +44,17 @@ export default async function handler(req, res) {
         iconSrc = /^data:image\//i.test(branding.customIconUri) ? '/api/branding/icon' : branding.customIconUri;
         const match = branding.customIconUri.match(/^data:(image\/(?:png|jpeg|jpg|webp));base64,/i);
         if (match) iconType = match[1].toLowerCase();
-      } else if (branding.appIcon) {
-        iconSrc = getPresetIcon(branding.appIcon);
-        iconType = 'image/svg+xml';
+      } else {
+        iconSrc = '/icon-512.png';
+        iconType = 'image/png';
       }
     }
   } catch (error) {
     console.warn('GET /api/manifest fallback to default branding:', error);
   }
+
+  const finalIconSrc = iconSrc || '/icon-512.png';
+  const finalIconType = iconType || 'image/png';
 
   return res.status(200).json({
     id: '/fake-call-app/',
@@ -66,31 +69,31 @@ export default async function handler(req, res) {
     theme_color: '#000000',
     orientation: 'portrait',
     prefer_related_applications: false,
-    icons: iconSrc ? [
+    icons: [
       {
-        src: iconSrc,
+        src: finalIconSrc === '/icon-512.png' ? '/icon-192.png' : finalIconSrc,
         sizes: '192x192',
-        type: iconType,
+        type: finalIconType,
         purpose: 'any'
       },
       {
-        src: iconSrc,
+        src: '/icon-maskable-192.png',
         sizes: '192x192',
-        type: iconType,
+        type: 'image/png',
         purpose: 'maskable'
       },
       {
-        src: iconSrc,
+        src: finalIconSrc,
         sizes: '512x512',
-        type: iconType,
+        type: finalIconType,
         purpose: 'any'
       },
       {
-        src: iconSrc,
+        src: '/icon-maskable-512.png',
         sizes: '512x512',
-        type: iconType,
+        type: 'image/png',
         purpose: 'maskable'
       }
-    ] : []
+    ]
   });
 }

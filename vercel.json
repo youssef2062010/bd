@@ -1,5 +1,5 @@
 {
-  "name": "didas-birthday",
+  "name": "didabd",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "cleanUrls": false,

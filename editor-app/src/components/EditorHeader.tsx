@@ -38,7 +38,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
     try {
       const url = onGenerateCallLink
         ? await onGenerateCallLink()
-        : new URL('/fake-call-app/index.html?configId=main', window.location.origin).toString();
+        : new URL('/install?configId=main', window.location.origin).toString();
       await navigator.clipboard.writeText(url);
       setCallLinkCopied(true);
       setTimeout(() => setCallLinkCopied(false), 2000);

@@ -25,8 +25,17 @@ export default async function handler(req, res) {
       const result = await handleUpload({
         request: req,
         body,
-        onBeforeGenerateToken: async (pathname) => {
-          if (!authorized(req)) throw new Error('Unauthorized');
+        onBeforeGenerateToken: async (pathname, clientPayload) => {
+          // Auth from either Authorization header or clientPayload
+          let isAuth = authorized(req);
+          if (!isAuth && clientPayload) {
+            try {
+              const payload = JSON.parse(clientPayload);
+              const expected = process.env.ADMIN_API_KEY;
+              isAuth = !expected || payload.adminKey === expected;
+            } catch {}
+          }
+          if (!isAuth) throw new Error('Unauthorized');
           if (!/^fakecall\/(image|voice)\/[a-zA-Z0-9._-]+$/.test(pathname)) throw new Error('Invalid media path');
           const image = pathname.startsWith('fakecall/image/');
           return {
@@ -39,6 +48,7 @@ export default async function handler(req, res) {
       });
       return res.status(200).json(result);
     }
+
     if (!authorized(req)) return res.status(401).json({ error: 'Unauthorized' });
     const dataUrl = body?.dataUrl;
     const kind = body?.kind === 'voice' ? 'voice' : 'image';

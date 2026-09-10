@@ -13,12 +13,14 @@ export default async function iconHandler(req, res) {
       const match = typeof branding.appIconUrl === 'string'
         ? branding.appIconUrl.match(/^data:(image\/(?:png|jpeg|jpg|webp));base64,(.+)$/i)
         : null;
-      if (!match) return res.status(404).json({ error: 'No custom icon configured' });
+      if (!match) {
+        return res.redirect(307, '/icon-512.png');
+      }
       res.setHeader('Content-Type', match[1]);
       res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
       return res.status(200).send(Buffer.from(match[2], 'base64'));
     } catch {
-      return res.status(500).json({ error: 'Failed to read app icon' });
+      return res.redirect(307, '/icon-512.png');
     }
   }
 

@@ -46,9 +46,20 @@ export function App() {
     });
   }, [config.branding]);
 
-  // Mobile view handling: always stay in direct fake call mode
+  // Standalone protection: ensure app only runs as installed PWA, redirect browser visits to /install
   useEffect(() => {
-    // No redirect to install page - direct call mode is always active
+    const isStandalone =
+      window.matchMedia('(display-mode: standalone)').matches ||
+      window.matchMedia('(display-mode: fullscreen)').matches ||
+      (window.navigator as any).standalone === true;
+
+    const params = new URLSearchParams(window.location.search);
+    const isAllowed = params.get('preview') === 'admin' || window.self !== window.top;
+
+    if (!isStandalone && !isAllowed) {
+      const configId = params.get('configId') || 'main';
+      window.location.replace(`/install?configId=${encodeURIComponent(configId)}`);
+    }
   }, []);
 
   // Bootstrap from the stable link ID before rendering or playing any call UI.

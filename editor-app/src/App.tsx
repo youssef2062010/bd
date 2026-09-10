@@ -161,11 +161,11 @@ export function App() {
   const handleGenerateCallLink = async () => {
     if (hasUnsavedEditsRef.current) await handleManualForceSync();
     if (hasUnsavedEditsRef.current) throw new Error(saveError || 'Save the configuration before generating a link.');
-    return new URL('/fake-call-app/index.html?configId=main', window.location.origin).toString();
+    return new URL('/install?configId=main', window.location.origin).toString();
   };
 
   const handleOpenFakeCallApp = () => {
-    window.open('/fake-call-app/index.html?mode=standalone', '_blank');
+    window.open('/fake-call-app/index.html?mode=standalone&preview=admin', '_blank');
   };
 
   const navTabs: NavTabItem[] = [

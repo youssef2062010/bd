@@ -225,8 +225,8 @@ function syncApiPlugin(): Plugin {
           iconSrc = /^data:image\//i.test(branding.appIconUrl) ? '/api/branding/icon' : branding.appIconUrl;
           const match = branding.appIconUrl.match(/^data:(image\/(?:png|jpeg|jpg|webp));base64,/i);
           if (match) iconType = match[1].toLowerCase();
-        } else if (branding.appIcon) {
-          iconSrc = getPresetIcon(branding.appIcon);
+        } else {
+          iconSrc = getPresetIcon(branding.appIcon || 'phone-green');
           iconType = 'image/svg+xml';
         }
       } catch (error) {
@@ -245,12 +245,12 @@ function syncApiPlugin(): Plugin {
         theme_color: '#000000',
         orientation: 'portrait',
         prefer_related_applications: false,
-        icons: iconSrc ? [
-          { src: iconSrc, sizes: '192x192', type: iconType, purpose: 'any' },
-          { src: iconSrc, sizes: '192x192', type: iconType, purpose: 'maskable' },
-          { src: iconSrc, sizes: '512x512', type: iconType, purpose: 'any' },
-          { src: iconSrc, sizes: '512x512', type: iconType, purpose: 'maskable' }
-        ] : []
+        icons: [
+          { src: iconSrc || '/icon-512.png', sizes: '192x192', type: iconType || 'image/png', purpose: 'any' },
+          { src: '/icon-maskable-192.png', sizes: '192x192', type: 'image/png', purpose: 'maskable' },
+          { src: iconSrc || '/icon-512.png', sizes: '512x512', type: iconType || 'image/png', purpose: 'any' },
+          { src: '/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }
+        ]
       }));
       return;
     }
