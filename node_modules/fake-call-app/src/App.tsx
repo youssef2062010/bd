@@ -154,6 +154,18 @@ export function App() {
     clearTimers();
     try { audioPlayerService.stopAll(); } catch { }
     try { hapticService.stop(); } catch { }
+
+    if (cfg.callSettings.launchAction === 'answer') {
+      startActiveCall(cfg);
+      return;
+    }
+
+    if (cfg.callSettings.launchAction === 'decline') {
+      setCallDuration(0);
+      setCallState('ended');
+      return;
+    }
+
     setCallState('incoming');
     setVoiceProgress({ current: 0, total: 0 });
 

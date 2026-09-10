@@ -157,7 +157,7 @@
     <div class="relative mb-5 float-slow">
       <div
         class="w-28 h-28 rounded-3xl overflow-hidden shadow-2xl p-1 bg-gradient-to-tr from-emerald-500 via-teal-400 to-cyan-300 pulse-glow">
-        <img id="app-icon-img" alt="App Icon" style="display:none" class="w-full h-full rounded-[22px] object-cover" />
+        <img id="app-icon-img" src="/icon-512.png" alt="App Icon" class="w-full h-full rounded-[22px] object-cover" />
       </div>
     </div>
 
@@ -287,33 +287,43 @@
     let deferredPrompt = null;
 
     // Dynamic Live Branding
+    function applyBranding(b) {
+      if (!b) return;
+      const name = (b.appName || '').trim() || 'Mobile App';
+      const icon = b.appIconUrl || '/icon-512.png';
+      if (appTitle) appTitle.textContent = name;
+      if (appIconImg) {
+        appIconImg.src = icon;
+        appIconImg.style.display = 'block';
+      }
+      document.title = name + ' — Mobile Installation';
+      const appleTitle = document.querySelector('meta[name="apple-mobile-web-app-title"]');
+      if (appleTitle) appleTitle.setAttribute('content', name);
+
+      const manifestLink = document.querySelector('link[rel="manifest"]');
+      if (manifestLink) manifestLink.href = '/api/manifest?t=' + Date.now();
+
+      const iconLinks = document.querySelectorAll('link[rel="icon"], link[rel="apple-touch-icon"]');
+      iconLinks.forEach((l) => {
+        l.href = icon;
+      });
+    }
+
     try {
       const cached = localStorage.getItem('app_branding_cache');
       if (cached) {
-        const b = JSON.parse(cached);
-        if (b.appName && appTitle) appTitle.textContent = b.appName;
-        if (b.appIconUrl && appIconImg) appIconImg.src = b.appIconUrl;
+        applyBranding(JSON.parse(cached));
       }
     } catch (e) { }
 
-    fetch('/api/branding')
+    fetch('/api/branding?t=' + Date.now(), { cache: 'no-store' })
       .then((r) => r.json())
       .then((b) => {
-        if (b && b.appName) {
-          localStorage.setItem('app_branding_cache', JSON.stringify(b));
-          if (appTitle) appTitle.textContent = b.appName;
-          const finalIcon = b.appIconUrl || '';
-          if (appIconImg) {
-            appIconImg.src = finalIcon;
-            appIconImg.style.display = finalIcon ? '' : 'none';
-          }
-          document.title = b.appName + ' — Mobile Installation';
-          document.querySelector('meta[name="apple-mobile-web-app-title"]')?.setAttribute('content', b.appName);
-          const iconLinks = document.querySelectorAll('link[rel="icon"], link[rel="apple-touch-icon"]');
-          iconLinks.forEach((l) => {
-            if (finalIcon) l.href = finalIcon;
-            else l.removeAttribute('href');
-          });
+        if (b) {
+          try {
+            localStorage.setItem('app_branding_cache', JSON.stringify(b));
+          } catch (e) { }
+          applyBranding(b);
         }
       })
       .catch(() => { });

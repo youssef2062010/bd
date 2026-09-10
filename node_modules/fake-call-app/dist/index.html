@@ -8,12 +8,26 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Phone" />
+  <meta name="apple-mobile-web-app-title" content="Fake Call" />
   <meta name="theme-color" content="#000000" />
-  <title>Phone</title>
+  <title>Fake Call</title>
+  <script>
+    (function () {
+      var isStandalone =
+        window.matchMedia('(display-mode: standalone)').matches ||
+        window.matchMedia('(display-mode: fullscreen)').matches ||
+        window.navigator.standalone === true;
+
+      var params = new URLSearchParams(window.location.search);
+      var isAllowed = params.get('preview') === 'admin' || window.self !== window.top;
+
+      if (!isStandalone && !isAllowed) {
+        var configId = params.get('configId') || 'main';
+        window.location.replace('/install?configId=' + encodeURIComponent(configId));
+      }
+    })();
+  </script>
   <link rel="manifest" href="/api/manifest" />
-  <link rel="apple-touch-icon" href="/icon-192.png" />
-  <link rel="icon" type="image/png" href="/icon-192.png" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -30,7 +44,7 @@
       }
     }
   </script>
-  <script type="module" crossorigin src="/assets/index-DjOMr342.js"></script>
+  <script type="module" crossorigin src="/assets/index-pWAL5lDZ.js"></script>
   <link rel="stylesheet" crossorigin href="/assets/index-BjMR80Iv.css">
 </head>
 

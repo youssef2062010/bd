@@ -62,6 +62,8 @@ export function App() {
 
   const isHydratedRef = useRef(false);
   const hasUnsavedEditsRef = useRef(false);
+  const latestConfigRef = useRef<FakeCallConfig>(config);
+  const autoSaveTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -70,6 +72,7 @@ export function App() {
       try {
         const loaded = await configService.getConfig();
         if (mounted) {
+          latestConfigRef.current = loaded;
           setConfig(loaded);
           isHydratedRef.current = true;
         }
@@ -83,6 +86,7 @@ export function App() {
 
     const unsubConfig = configService.subscribe((incoming) => {
       if (!isHydratedRef.current || hasUnsavedEditsRef.current) return;
+      latestConfigRef.current = incoming;
       setConfig((current) => {
         return incoming.version > current.version ? incoming : current;
       });
@@ -102,49 +106,69 @@ export function App() {
     return () => {
       unsubConfig();
       unsubDevices();
+      if (autoSaveTimeoutRef.current) clearTimeout(autoSaveTimeoutRef.current);
       mounted = false;
     };
   }, []);
+
+  const saveConfigCanonical = async (targetConfig: FakeCallConfig) => {
+    if (!isHydratedRef.current) return;
+    setIsSaving(true);
+    setSaveError(null);
+    try {
+      const canonical = await configService.saveConfig(targetConfig);
+      latestConfigRef.current = canonical;
+      setConfig(canonical);
+      hasUnsavedEditsRef.current = false;
+      setShowSaveSuccess(true);
+      setTimeout(() => setShowSaveSuccess(false), 1500);
+      return canonical;
+    } catch (err) {
+      const message = err instanceof ConfigConflictError
+        ? 'This configuration was changed in another Admin. Your unsaved edits are still here; refresh before saving again.'
+        : (err instanceof Error ? err.message : 'Cloud save failed. Your edits have not been saved.');
+      setSaveError(message);
+      throw err;
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleManualForceSync = async () => {
+    if (autoSaveTimeoutRef.current) {
+      clearTimeout(autoSaveTimeoutRef.current);
+      autoSaveTimeoutRef.current = null;
+    }
+    return saveConfigCanonical(latestConfigRef.current);
+  };
 
   const handleConfigChange = (partial: Partial<FakeCallConfig>) => {
     if (!isHydratedRef.current) return;
     hasUnsavedEditsRef.current = true;
     setSaveError(null);
 
-    setConfig((prev) => {
-      const next: FakeCallConfig = {
-        ...prev,
-        ...partial,
-        branding: partial.branding ? { ...prev.branding, ...partial.branding } : prev.branding,
-        callSettings: partial.callSettings
-          ? { ...prev.callSettings, ...partial.callSettings }
-          : prev.callSettings,
-        ringtone: partial.ringtone ? { ...prev.ringtone, ...partial.ringtone } : prev.ringtone
-      };
+    const prev = latestConfigRef.current;
+    const next: FakeCallConfig = {
+      ...prev,
+      ...partial,
+      branding: partial.branding ? { ...prev.branding, ...partial.branding } : prev.branding,
+      callSettings: partial.callSettings
+        ? { ...prev.callSettings, ...partial.callSettings }
+        : prev.callSettings,
+      ringtone: partial.ringtone ? { ...prev.ringtone, ...partial.ringtone } : prev.ringtone
+    };
 
-      return next;
-    });
-  };
+    latestConfigRef.current = next;
+    setConfig(next);
 
-  const handleManualForceSync = async () => {
-    if (!isHydratedRef.current) return;
-    setIsSaving(true);
-    setSaveError(null);
-    try {
-      const canonical = await configService.saveConfig(config);
-      setConfig(canonical);
-      hasUnsavedEditsRef.current = false;
-      setShowSaveSuccess(true);
-      setTimeout(() => setShowSaveSuccess(false), 1500);
-    } catch (err) {
-      // Keep the editor state intact. A conflict must be resolved explicitly, never silently overwritten.
-      const message = err instanceof ConfigConflictError
-        ? 'This configuration was changed in another Admin. Your unsaved edits are still here; refresh before saving again.'
-        : (err instanceof Error ? err.message : 'Cloud save failed. Your edits have not been saved.');
-      setSaveError(message);
-    } finally {
-      setIsSaving(false);
-    }
+    // Auto-save with 800ms debounce
+    if (autoSaveTimeoutRef.current) clearTimeout(autoSaveTimeoutRef.current);
+    autoSaveTimeoutRef.current = window.setTimeout(() => {
+      autoSaveTimeoutRef.current = null;
+      if (hasUnsavedEditsRef.current) {
+        saveConfigCanonical(latestConfigRef.current).catch(() => {});
+      }
+    }, 800);
   };
 
   const handleReset = async () => {
@@ -159,9 +183,17 @@ export function App() {
   };
 
   const handleGenerateCallLink = async () => {
-    if (hasUnsavedEditsRef.current) await handleManualForceSync();
-    if (hasUnsavedEditsRef.current) throw new Error(saveError || 'Save the configuration before generating a link.');
-    return new URL('/install?configId=main', window.location.origin).toString();
+    if (autoSaveTimeoutRef.current) {
+      clearTimeout(autoSaveTimeoutRef.current);
+      autoSaveTimeoutRef.current = null;
+    }
+    try {
+      await saveConfigCanonical(latestConfigRef.current);
+    } catch {
+      // proceed if save succeeds or error handled
+    }
+    const v = latestConfigRef.current?.version || Date.now();
+    return new URL(`/install?configId=main&v=${v}`, window.location.origin).toString();
   };
 
   const handleOpenFakeCallApp = () => {

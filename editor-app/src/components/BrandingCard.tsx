@@ -90,7 +90,7 @@ export const BrandingCard: React.FC<BrandingCardProps> = ({ config, onChange }) 
       branding: {
         ...branding,
         appIcon: preset.id,
-        customIconUri: undefined
+        customIconUri: ''
       }
     });
   };

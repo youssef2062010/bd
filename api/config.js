@@ -62,7 +62,7 @@ function validateConfig(config) {
   if (!isObject(r) || typeof r.id !== 'string' || typeof r.name !== 'string' || typeof r.uri !== 'string' ||
     typeof r.enabled !== 'boolean' || !Number.isFinite(r.volume) || r.volume < 0 || r.volume > 1) throw new Error('Invalid ringtone');
   const s = config.callSettings;
-  if (!isObject(s) || !Number.isFinite(s.autoAnswerDelaySeconds) || !Number.isFinite(s.callDuration) ||
+  if (!isObject(s) || !['incoming', 'answer', 'decline'].includes(s.launchAction) || !Number.isFinite(s.autoAnswerDelaySeconds) || !Number.isFinite(s.callDuration) ||
     !['pulse', 'radar', 'ripple'].includes(s.animationStyle) || !['romantic', 'dark', 'amoled', 'light'].includes(s.theme) ||
     !['ios', 'android'].includes(s.uiStyle) || !['slide', 'buttons'].includes(s.answerMethod) ||
     ['autoEndWhenAudioFinishes', 'vibrationEnabled', 'fallingHeartsEnabled', 'realisticVoiceFilter', 'autoRecordCalls'].some((key) => typeof s[key] !== 'boolean')) throw new Error('Invalid callSettings');

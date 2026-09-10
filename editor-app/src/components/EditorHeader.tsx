@@ -74,7 +74,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-base sm:text-xl font-black text-white tracking-tight leading-none drop-shadow flex items-center gap-1.5">
-                <span>{appName}</span>
+                <span>{appName || 'Fake Call'}</span>
                 <span className="text-slate-400 font-semibold text-sm">Studio</span>
               </h1>
               <span className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/35 shadow-sm shrink-0">

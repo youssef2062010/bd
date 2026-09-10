@@ -11,6 +11,19 @@ const DEFAULT_BRANDING = { appName: '', appIconUrl: '', appIcon: '', updatedAt: 
 const MAX_ICON_BYTES = 10 * 1024 * 1024;
 let memoryBranding = { ...DEFAULT_BRANDING };
 
+const presetColors = {
+  'phone-green': ['#10b981', '#0d9488'],
+  'phone-classic': ['#2563eb', '#4f46e5'],
+  'phone-dark': ['#334155', '#020617'],
+  'phone-gold': ['#f59e0b', '#d97706'],
+};
+
+function getPresetIcon(appIcon) {
+  const [start, end] = presetColors[appIcon] || presetColors['phone-green'];
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${start}"/><stop offset="100%" stop-color="${end}"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#g)"/><path d="M19 16c2.5 0 4 3 4.8 4.6.6 1.3.4 2.7-.6 3.7l-2 2c2 3.8 5 6.8 8.8 8.8l2-2c1-.9 2.4-1.2 3.7-.6 1.6.8 4.6 2.3 4.6 4.8 0 3.3-2.6 6-5.8 6-12.7 0-23-10.3-23-23 0-3.2 2.6-5.8 6-5.8z" fill="#fff"/></svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
 function normalizeBranding(input) {
   const base = { ...DEFAULT_BRANDING, ...(input || {}) };
   const appName = typeof base.appName === 'string' && base.appName.trim() ? base.appName.trim() : DEFAULT_BRANDING.appName;
@@ -81,12 +94,11 @@ export async function readBranding() {
       .maybeSingle();
 
     if (!error && data?.branding) {
-      const legacy = data.branding.appDisplayName === '12/12❤️' || data.branding.appIcon === 'farida' || data.branding.customIconUri === '/icon-192.png';
-      if (legacy) return { ...DEFAULT_BRANDING };
+      const iconUrl = data.branding.customIconUri || (data.branding.appIcon ? getPresetIcon(data.branding.appIcon) : '/icon-512.png');
       const b = {
         appName: data.branding.appDisplayName || '',
-        appIcon: data.branding.appIcon || '',
-        appIconUrl: data.branding.customIconUri || '',
+        appIcon: data.branding.appIcon || 'phone-green',
+        appIconUrl: iconUrl,
         updatedAt: Number(data.updated_at || Date.now())
       };
       memoryBranding = b;
@@ -102,6 +114,9 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cache-Control, Pragma');
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   if (req.method === 'GET') {

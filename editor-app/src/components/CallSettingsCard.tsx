@@ -1,5 +1,5 @@
 import React from 'react';
-import { FakeCallConfig, AppTheme, CallUiStyle, AnswerMethod } from '@fakecall/shared';
+import { FakeCallConfig, AppTheme, CallUiStyle, AnswerMethod, LaunchAction } from '@fakecall/shared';
 import { Vibrate, Clock, Smartphone, PhoneCall, Radio, Heart } from 'lucide-react';
 
 interface CallSettingsCardProps {
@@ -54,11 +54,10 @@ export const CallSettingsCard: React.FC<CallSettingsCardProps> = ({ config, onCh
                 key={t.id}
                 type="button"
                 onClick={() => updateSettings({ theme: t.id as AppTheme })}
-                className={`py-3 px-2 text-xs font-bold rounded-xl border transition active:scale-95 ${
-                  settings.theme === t.id
+                className={`py-3 px-2 text-xs font-bold rounded-xl border transition active:scale-95 ${settings.theme === t.id
                     ? 'border-pink-500 bg-pink-950/50 text-pink-300 shadow-md ring-1 ring-pink-500/40'
                     : 'border-white/[0.08] bg-slate-900/80 text-slate-400 hover:border-white/[0.15] hover:text-white'
-                }`}
+                  }`}
               >
                 {t.label}
               </button>
@@ -66,7 +65,34 @@ export const CallSettingsCard: React.FC<CallSettingsCardProps> = ({ config, onCh
           </div>
         </div>
 
-        {/* 2. Falling Hearts Rain Switch */}
+        {/* 2. Launch Action */}
+        <div className="bg-slate-950/80 p-5 rounded-2xl border border-white/[0.08] lg:col-span-2">
+          <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-3 flex items-center gap-2">
+            <PhoneCall className="w-4 h-4 text-rose-400" />
+            <span>Action On App Launch</span>
+          </label>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            {[
+              { id: 'incoming', label: 'Show Incoming Call' },
+              { id: 'answer', label: 'Answer Directly' },
+              { id: 'decline', label: 'Decline Directly' }
+            ].map((action) => (
+              <button
+                key={action.id}
+                type="button"
+                onClick={() => updateSettings({ launchAction: action.id as LaunchAction })}
+                className={`py-3 px-3 text-xs sm:text-sm font-bold rounded-xl border transition active:scale-95 ${settings.launchAction === action.id
+                    ? 'border-rose-500 bg-rose-950/50 text-rose-300 shadow-md ring-1 ring-rose-500/40'
+                    : 'border-white/[0.08] bg-slate-900/80 text-slate-400 hover:border-white/[0.15] hover:text-white'
+                  }`}
+              >
+                {action.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* 3. Falling Hearts Rain Switch */}
         <div className="bg-slate-950/80 p-5 rounded-2xl border border-white/[0.08] flex items-center justify-between">
           <div className="flex items-center gap-3.5">
             <div className="p-2.5 rounded-xl bg-pink-500/10 text-pink-400">
@@ -103,11 +129,10 @@ export const CallSettingsCard: React.FC<CallSettingsCardProps> = ({ config, onCh
                 key={style.id}
                 type="button"
                 onClick={() => updateSettings({ uiStyle: style.id as CallUiStyle })}
-                className={`py-3 px-3 text-xs sm:text-sm font-bold rounded-xl border transition active:scale-95 ${
-                  settings.uiStyle === style.id
+                className={`py-3 px-3 text-xs sm:text-sm font-bold rounded-xl border transition active:scale-95 ${settings.uiStyle === style.id
                     ? 'border-emerald-500 bg-emerald-950/50 text-emerald-300 shadow-md ring-1 ring-emerald-500/40'
                     : 'border-white/[0.08] bg-slate-900/80 text-slate-400 hover:border-white/[0.15] hover:text-white'
-                }`}
+                  }`}
               >
                 {style.label}
               </button>
@@ -130,11 +155,10 @@ export const CallSettingsCard: React.FC<CallSettingsCardProps> = ({ config, onCh
                 key={method.id}
                 type="button"
                 onClick={() => updateSettings({ answerMethod: method.id as AnswerMethod })}
-                className={`py-3 px-3 text-xs sm:text-sm font-bold rounded-xl border transition active:scale-95 ${
-                  settings.answerMethod === method.id
+                className={`py-3 px-3 text-xs sm:text-sm font-bold rounded-xl border transition active:scale-95 ${settings.answerMethod === method.id
                     ? 'border-blue-500 bg-blue-950/50 text-blue-300 shadow-md ring-1 ring-blue-500/40'
                     : 'border-white/[0.08] bg-slate-900/80 text-slate-400 hover:border-white/[0.15] hover:text-white'
-                }`}
+                  }`}
               >
                 {method.label}
               </button>
@@ -220,11 +244,10 @@ export const CallSettingsCard: React.FC<CallSettingsCardProps> = ({ config, onCh
                 key={opt.val}
                 type="button"
                 onClick={() => updateSettings({ autoAnswerDelaySeconds: opt.val })}
-                className={`py-3 px-2 text-xs sm:text-sm font-bold rounded-xl border transition active:scale-95 ${
-                  settings.autoAnswerDelaySeconds === opt.val
+                className={`py-3 px-2 text-xs sm:text-sm font-bold rounded-xl border transition active:scale-95 ${settings.autoAnswerDelaySeconds === opt.val
                     ? 'border-emerald-500 bg-emerald-950/50 text-emerald-300 shadow-md ring-1 ring-emerald-500/40'
                     : 'border-white/[0.08] bg-slate-900/80 text-slate-400 hover:border-white/[0.15] hover:text-white'
-                }`}
+                  }`}
               >
                 {opt.label}
               </button>

@@ -10,6 +10,10 @@ export default async function iconHandler(req, res) {
   if (req.method === 'GET') {
     try {
       const branding = await readBranding();
+      if (typeof branding.appIconUrl === 'string' && /^https?:\/\//i.test(branding.appIconUrl)) {
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+        return res.redirect(307, branding.appIconUrl);
+      }
       const match = typeof branding.appIconUrl === 'string'
         ? branding.appIconUrl.match(/^data:(image\/(?:png|jpeg|jpg|webp));base64,(.+)$/i)
         : null;

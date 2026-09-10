@@ -19,10 +19,6 @@ const BRANDING_API = '/api/branding';
 
 function normalizeBranding(value: unknown): AppBranding {
     const input = value && typeof value === 'object' ? value as Partial<AppBranding> : {};
-    const isLegacyTestBranding = input.appName === '12/12❤️' || input.appIcon === 'farida' || input.appIconUrl === '/icon-192.png';
-    if (isLegacyTestBranding) {
-        return { ...DEFAULT_APP_BRANDING };
-    }
     return {
         appName: typeof input.appName === 'string' && input.appName.trim() ? input.appName.trim() : DEFAULT_APP_BRANDING.appName,
         appIconUrl: typeof input.appIconUrl === 'string' ? input.appIconUrl : DEFAULT_APP_BRANDING.appIconUrl,

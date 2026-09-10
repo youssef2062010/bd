@@ -36,9 +36,7 @@ export default async function handler(req, res) {
       .maybeSingle();
 
     if (!error && data?.branding) {
-      const branding = data.branding.appDisplayName === '12/12❤️' || data.branding.appIcon === 'farida' || data.branding.customIconUri === '/icon-192.png'
-        ? {}
-        : data.branding;
+      const branding = data.branding;
       if (branding.appDisplayName?.trim()) appName = branding.appDisplayName.trim();
       if (branding.customIconUri) {
         iconSrc = /^data:image\//i.test(branding.customIconUri) ? '/api/branding/icon' : branding.customIconUri;

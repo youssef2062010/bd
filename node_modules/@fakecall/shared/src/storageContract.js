@@ -660,8 +660,8 @@ class CrossPlatformStorageService {
         };
     }
     mergeWithDefaults(saved) {
-        const legacyBranding = saved.branding && (saved.branding.appDisplayName === '12/12❤️' || saved.branding.appIcon === 'farida' || saved.branding.customIconUri === '/icon-192.png');
-        const legacyCaller = saved.callerName === 'Farida' && saved.callerPhone === '+20 10 1234 5678';
+        const legacyBranding = false;
+        const legacyCaller = false;
         return {
             callerName: legacyCaller ? '' : (saved.callerName || DEFAULT_CONFIG.callerName),
             callerPhone: legacyCaller ? '' : (saved.callerPhone || DEFAULT_CONFIG.callerPhone),

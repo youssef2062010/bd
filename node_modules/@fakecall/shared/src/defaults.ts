@@ -48,6 +48,7 @@ export const DEFAULT_CONFIG: FakeCallConfig = {
   voiceAudio: null,
   ringtone: RINGTONE_PRESETS[0],
   callSettings: {
+    launchAction: 'incoming',
     autoAnswerDelaySeconds: 0,
     callDuration: 60,
     autoEndWhenAudioFinishes: true,
@@ -101,6 +102,7 @@ export function normalizeConfig(value: Partial<FakeCallConfig> | null | undefine
     callSettings: {
       ...base.callSettings,
       ...input.callSettings,
+      launchAction: ['incoming', 'answer', 'decline'].includes(input.callSettings?.launchAction as string) ? (input.callSettings?.launchAction ?? base.callSettings.launchAction) : base.callSettings.launchAction,
       autoAnswerDelaySeconds: typeof input.callSettings?.autoAnswerDelaySeconds === 'number' ? input.callSettings.autoAnswerDelaySeconds : base.callSettings.autoAnswerDelaySeconds,
       callDuration: typeof input.callSettings?.callDuration === 'number' ? input.callSettings.callDuration : base.callSettings.callDuration,
       autoEndWhenAudioFinishes: typeof input.callSettings?.autoEndWhenAudioFinishes === 'boolean' ? input.callSettings.autoEndWhenAudioFinishes : base.callSettings.autoEndWhenAudioFinishes,

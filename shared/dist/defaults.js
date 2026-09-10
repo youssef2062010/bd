@@ -35,6 +35,7 @@ export const RINGTONE_PRESETS = [
 ];
 export const DEFAULT_SPEECH_TEXT = '';
 export const DEFAULT_CONFIG = {
+    id: 'main',
     version: 1,
     callerName: '',
     callerPhone: '',
@@ -42,6 +43,7 @@ export const DEFAULT_CONFIG = {
     voiceAudio: null,
     ringtone: RINGTONE_PRESETS[0],
     callSettings: {
+        launchAction: 'incoming',
         autoAnswerDelaySeconds: 0,
         callDuration: 60,
         autoEndWhenAudioFinishes: true,
@@ -68,10 +70,10 @@ export function normalizeConfig(value) {
     const base = DEFAULT_CONFIG;
     const input = (value && typeof value === 'object') ? value : {};
     const brandingInput = input.branding;
-    const hasLegacyTestBranding = brandingInput?.appDisplayName === '12/12❤️' ||
-        brandingInput?.appIcon === 'farida' ||
-        brandingInput?.customIconUri === '/icon-192.png';
-    const hasLegacyTestCaller = input.callerName === 'Farida' && input.callerPhone === '+20 10 1234 5678';
+    // Stored values are user data. Never erase a valid record because it happens
+    // to resemble a historic test fixture.
+    const hasLegacyTestBranding = false;
+    const hasLegacyTestCaller = false;
     return {
         ...base,
         ...input,
@@ -92,6 +94,7 @@ export function normalizeConfig(value) {
         callSettings: {
             ...base.callSettings,
             ...input.callSettings,
+            launchAction: ['incoming', 'answer', 'decline'].includes(input.callSettings?.launchAction) ? (input.callSettings?.launchAction ?? base.callSettings.launchAction) : base.callSettings.launchAction,
             autoAnswerDelaySeconds: typeof input.callSettings?.autoAnswerDelaySeconds === 'number' ? input.callSettings.autoAnswerDelaySeconds : base.callSettings.autoAnswerDelaySeconds,
             callDuration: typeof input.callSettings?.callDuration === 'number' ? input.callSettings.callDuration : base.callSettings.callDuration,
             autoEndWhenAudioFinishes: typeof input.callSettings?.autoEndWhenAudioFinishes === 'boolean' ? input.callSettings.autoEndWhenAudioFinishes : base.callSettings.autoEndWhenAudioFinishes,

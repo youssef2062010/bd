@@ -103,9 +103,7 @@ function syncApiPlugin(): Plugin {
           .eq('id', 'main')
           .maybeSingle();
         if (!error && data?.branding) {
-          const branding = data.branding.appDisplayName === '12/12❤️' || data.branding.appIcon === 'farida' || data.branding.customIconUri === '/icon-192.png'
-            ? {}
-            : data.branding;
+          const branding = data.branding;
           return {
             appName: branding.appDisplayName || '',
             appIcon: branding.appIcon || '',

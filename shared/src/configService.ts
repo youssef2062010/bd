@@ -62,6 +62,20 @@ class ServerConfigService {
     });
     const payload = await response.json().catch(() => ({}));
     if (response.status === 409) {
+      if (payload.config && typeof payload.config.version === 'number') {
+        const retryRes = await fetch(this.apiUrl(), {
+          method: 'POST',
+          cache: 'no-store',
+          headers,
+          body: JSON.stringify({ configId: config.id || 'main', baseVersion: payload.config.version, config: { ...config, version: payload.config.version } })
+        });
+        const retryPayload = await retryRes.json().catch(() => ({}));
+        if (retryRes.ok && retryPayload.config) {
+          const canonical = normalizeConfig(retryPayload.config);
+          this.publish(canonical);
+          return canonical;
+        }
+      }
       throw new ConfigConflictError(payload.error || 'This configuration was changed elsewhere', payload.config ? normalizeConfig(payload.config) : null);
     }
     if (!response.ok || !payload.config) throw new Error(payload.error || `Configuration save failed (${response.status})`);

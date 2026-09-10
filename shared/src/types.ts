@@ -33,8 +33,11 @@ export type CallAnimationStyle = 'pulse' | 'radar' | 'ripple';
 export type AppTheme = 'romantic' | 'dark' | 'amoled' | 'light';
 export type CallUiStyle = 'ios' | 'android';
 export type AnswerMethod = 'slide' | 'buttons';
+export type LaunchAction = 'incoming' | 'answer' | 'decline';
 
 export interface CallSettingsConfig {
+  /** Screen/action shown immediately when the app launches */
+  launchAction: LaunchAction;
   /** Delay in seconds before auto-answering (0 = manual answer only) */
   autoAnswerDelaySeconds: number;
   /** Safety maximum call duration in seconds if voice does not finish */
