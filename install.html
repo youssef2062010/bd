@@ -11,7 +11,19 @@
   <meta name="apple-mobile-web-app-title" content="Mobile Installation" />
   <meta name="theme-color" content="#040711" />
   <title>Mobile Installation</title>
-  <link rel="manifest" href="/api/manifest" />
+  <link id="app-manifest" rel="manifest" href="/api/manifest" />
+  <script>
+    (function() {
+      try {
+        var params = new URLSearchParams(window.location.search);
+        var v = params.get('v');
+        var manifestEl = document.getElementById('app-manifest');
+        if (manifestEl && v) {
+          manifestEl.href = '/api/manifest?v=' + encodeURIComponent(v);
+        }
+      } catch (e) {}
+    })();
+  </script>
   <link rel="apple-touch-icon" sizes="180x180" href="/api/branding/icon" />
   <link rel="apple-touch-icon" href="/api/branding/icon" />
   <link rel="apple-touch-icon-precomposed" href="/api/branding/icon" />
@@ -173,9 +185,28 @@
       Incoming Call Simulator • Fullscreen Mobile App
     </p>
 
-    <!-- INSTALLATION CARD -->
+    <!-- INSTALLATION CARD (Always active, allows repeated installs) -->
     <div id="install-card"
       class="w-full bg-slate-900/90 border border-white/10 rounded-2xl p-5 shadow-2xl flex flex-col gap-4">
+
+      <!-- Installation Success Notification Banner (shown when installed, card stays 100% active!) -->
+      <div id="installed-banner"
+        class="w-full bg-emerald-950/80 border border-emerald-500/40 rounded-xl p-3 text-left hidden items-center gap-3 pop-in">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/30">
+          <svg class="w-5 h-5 stroke-[3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="text-xs font-black text-white flex items-center gap-1.5">
+            <span>Installed Successfully!</span>
+            <span class="text-[9px] px-1.5 py-0.5 bg-emerald-400/20 text-emerald-300 rounded font-mono">ON PHONE</span>
+          </div>
+          <div class="text-[10px] text-slate-300 leading-tight mt-0.5">
+            App is ready on your Home Screen. You can install another copy or update anytime below!
+          </div>
+        </div>
+      </div>
 
       <!-- Feature Badges -->
       <div class="grid grid-cols-2 gap-2 text-left">
@@ -215,6 +246,15 @@
         <span id="btn-install-text">Install App on Phone</span>
       </button>
 
+      <!-- Reinstall / Install Another Copy Button (Generates fresh session for repeated installs) -->
+      <button id="btn-fresh-install" type="button"
+        class="w-full py-3 px-4 rounded-xl bg-slate-800/90 hover:bg-slate-700/90 active:scale-95 text-slate-200 hover:text-white border border-white/10 font-bold text-xs transition-all flex items-center justify-center gap-2 shadow-md">
+        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        <span id="btn-fresh-text">Install Another Copy (New Shortcut)</span>
+      </button>
+
       <!-- Step-by-Step Instructions Box -->
       <div id="instructions-box"
         class="w-full bg-slate-950/80 border border-white/5 rounded-xl p-3.5 text-left text-xs flex flex-col gap-2.5">
@@ -228,63 +268,6 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
         </svg>
         <span>Open Call Directly (Answer / Decline)</span>
-      </a>
-
-    </div>
-
-    <!-- INSTALLED SUCCESS CARD -->
-    <div id="installed-card"
-      class="w-full bg-emerald-950/40 border-2 border-emerald-500/50 rounded-3xl p-6 shadow-2xl hidden flex-col items-center text-center gap-4 pop-in">
-
-      <div class="relative flex items-center justify-center">
-        <div class="absolute -inset-2 rounded-full bg-emerald-500/30 animate-ping"></div>
-        <div
-          class="relative w-20 h-20 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 flex items-center justify-center shadow-2xl shadow-emerald-500/50">
-          <svg class="w-10 h-10 text-slate-950 stroke-[3.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path class="draw-check" stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-          </svg>
-        </div>
-      </div>
-
-      <div class="flex flex-col items-center">
-        <span class="text-3xl font-black text-white tracking-tight">Installed Successfully!</span>
-        <span class="text-xs font-bold text-emerald-400 mt-1">App is now on your phone's Home Screen</span>
-      </div>
-
-      <p class="text-xs text-slate-300 leading-relaxed">
-        Phone App is now installed as an independent mobile application. You can find it in your phone's App Drawer and
-        Home Screen.
-      </p>
-
-      <!-- Launch instructions from phone home screen -->
-      <div class="w-full p-4 rounded-2xl bg-slate-900/90 border border-emerald-500/30 flex flex-col items-center gap-2">
-        <div class="flex items-center gap-2 text-emerald-300 font-bold text-sm">
-          <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-          </svg>
-          <span>Open from Your Home Screen</span>
-        </div>
-        <p class="text-[11px] text-slate-300 leading-relaxed">
-          Close this browser tab and tap the app icon on your phone's Home Screen to launch the fullscreen call app without any browser address bar.
-        </p>
-      </div>
-
-      <!-- Reinstall / Install Again Button -->
-      <button id="btn-reinstall" type="button"
-        class="w-full py-3.5 px-5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 active:scale-95 text-slate-950 font-black text-sm shadow-xl shadow-emerald-500/25 transition-all flex items-center justify-center gap-2">
-        <svg class="w-4 h-4 text-slate-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-        </svg>
-        <span>Install Again / Download Update</span>
-      </button>
-
-      <!-- Open Call Directly Button -->
-      <a id="btn-installed-open-call" href="/fake-call-app/index.html?preview=admin&configId=main"
-        class="w-full py-3 px-4 rounded-xl bg-slate-800/90 hover:bg-slate-700/90 active:scale-95 text-slate-200 hover:text-white border border-white/10 font-bold text-xs transition-all flex items-center justify-center gap-2 shadow-md">
-        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-        </svg>
-        <span>Open Call Directly Now</span>
       </a>
 
     </div>
@@ -309,9 +292,10 @@
     }
 
     const installCard = document.getElementById('install-card');
-    const installedCard = document.getElementById('installed-card');
+    const installedBanner = document.getElementById('installed-banner');
     const btnInstall = document.getElementById('btn-install');
     const btnInstallText = document.getElementById('btn-install-text');
+    const btnFreshInstall = document.getElementById('btn-fresh-install');
     const headerStatus = document.getElementById('header-status');
     const instructionsBox = document.getElementById('instructions-box');
     const appTitle = document.getElementById('app-title');
@@ -333,8 +317,12 @@
       const appleTitle = document.querySelector('meta[name="apple-mobile-web-app-title"]');
       if (appleTitle) appleTitle.setAttribute('content', name);
 
-      const manifestLink = document.querySelector('link[rel="manifest"]');
-      if (manifestLink) manifestLink.href = '/api/manifest?t=' + Date.now();
+      const manifestLink = document.getElementById('app-manifest') || document.querySelector('link[rel="manifest"]');
+      if (manifestLink) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const v = urlParams.get('v') || b.version || b.updatedAt || Date.now();
+        manifestLink.href = '/api/manifest?v=' + encodeURIComponent(v) + '&t=' + Date.now();
+      }
 
       const iconLinks = document.querySelectorAll('link[rel*="icon"]');
       iconLinks.forEach((l) => {
@@ -361,59 +349,65 @@
       })
       .catch(() => { });
 
-    // Device-Specific Instructions (100% English)
-    if (isIos) {
-      btnInstall.classList.add('hidden'); // iOS Safari requires Share -> Add to Home Screen
-      instructionsBox.innerHTML = `
-        <div class="font-bold text-white flex items-center gap-1.5 pb-1 border-b border-white/10">
-          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-          <span>How to Install on iPhone / iPad (Safari):</span>
-        </div>
-        <div class="flex items-start gap-2.5">
-          <span class="w-5 h-5 rounded-full bg-emerald-500 text-slate-950 font-black text-xs flex items-center justify-center shrink-0">1</span>
-          <span class="text-slate-200">Tap the <strong>Share</strong> button at the bottom of Safari <strong class="inline-block bg-white/10 px-1.5 py-0.5 rounded text-emerald-300 font-mono">[↑]</strong>.</span>
-        </div>
-        <div class="flex items-start gap-2.5">
-          <span class="w-5 h-5 rounded-full bg-emerald-500 text-slate-950 font-black text-xs flex items-center justify-center shrink-0">2</span>
-          <span class="text-slate-200">Scroll down and tap <strong class="text-white">"Add to Home Screen"</strong> <strong class="inline-block bg-white/10 px-1.5 py-0.5 rounded text-emerald-300 font-bold">[+]</strong>.</span>
-        </div>
-        <div class="flex items-start gap-2.5">
-          <span class="w-5 h-5 rounded-full bg-emerald-500 text-slate-950 font-black text-xs flex items-center justify-center shrink-0">3</span>
-          <span class="text-slate-200">Tap <strong class="text-white">"Add"</strong> in the top-right corner.</span>
-        </div>
-        <div class="pt-1.5 border-t border-white/10 text-[11px] text-emerald-300 font-semibold">
-          ✓ The app icon appears on your iPhone Home Screen and opens full-screen without Safari toolbars!
-        </div>
-      `;
-    } else {
-      instructionsBox.innerHTML = `
-        <div class="font-bold text-white flex items-center gap-1.5 pb-1 border-b border-white/10">
-          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-          <span>How to Install as a Native App on Android:</span>
-        </div>
-        <div class="flex items-start gap-2">
-          <span class="w-5 h-5 rounded-full bg-emerald-500 text-slate-950 font-black text-xs flex items-center justify-center shrink-0">1</span>
-          <span class="text-slate-200">Tap the <strong>"Install App on Phone"</strong> button above.</span>
-        </div>
-        <div class="flex items-start gap-2">
-          <span class="w-5 h-5 rounded-full bg-emerald-500 text-slate-950 font-black text-xs flex items-center justify-center shrink-0">2</span>
-          <span class="text-slate-200">In the prompt dialog, tap <strong>"Install"</strong>.</span>
-        </div>
-        <div class="pt-1 border-t border-white/10 text-[11px] text-slate-300">
-          💡 <strong>If no prompt appears:</strong> Tap Chrome's menu <strong>(3 dots ⋮ in top-right)</strong> and select <strong>"Install app"</strong> (or "Add to Home screen").
-        </div>
-        <div class="pt-1 border-t border-white/10 text-[11px] text-emerald-300 font-semibold">
-          ✓ Installs directly into your phone's App Drawer and Home Screen without any Chrome badge.
-        </div>
-      `;
+    // Step-by-Step Instructions
+    function renderInstructions() {
+      if (isIos) {
+        btnInstall.classList.add('hidden'); // iOS Safari requires Share -> Add to Home Screen
+        if (btnFreshInstall) btnFreshInstall.classList.add('hidden');
+        instructionsBox.innerHTML = `
+          <div class="font-bold text-white flex items-center gap-1.5 pb-1 border-b border-white/10">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span>How to Install on iPhone / iPad (Safari):</span>
+          </div>
+          <div class="flex items-start gap-2.5">
+            <span class="w-5 h-5 rounded-full bg-emerald-500 text-slate-950 font-black text-xs flex items-center justify-center shrink-0">1</span>
+            <span class="text-slate-200">Tap the <strong>Share</strong> button at the bottom of Safari <strong class="inline-block bg-white/10 px-1.5 py-0.5 rounded text-emerald-300 font-mono">[↑]</strong>.</span>
+          </div>
+          <div class="flex items-start gap-2.5">
+            <span class="w-5 h-5 rounded-full bg-emerald-500 text-slate-950 font-black text-xs flex items-center justify-center shrink-0">2</span>
+            <span class="text-slate-200">Scroll down and tap <strong class="text-white">"Add to Home Screen"</strong> <strong class="inline-block bg-white/10 px-1.5 py-0.5 rounded text-emerald-300 font-bold">[+]</strong>.</span>
+          </div>
+          <div class="flex items-start gap-2.5">
+            <span class="w-5 h-5 rounded-full bg-emerald-500 text-slate-950 font-black text-xs flex items-center justify-center shrink-0">3</span>
+            <span class="text-slate-200">Tap <strong class="text-white">"Add"</strong> in the top-right corner.</span>
+          </div>
+          <div class="pt-1.5 border-t border-white/10 text-[11px] text-emerald-300 font-semibold">
+            ✓ You can repeat these 3 steps anytime to add more app icons to your Home Screen!
+          </div>
+        `;
+      } else {
+        instructionsBox.innerHTML = `
+          <div class="font-bold text-white flex items-center gap-1.5 pb-1 border-b border-white/10">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span>How to Install as a Native App on Android:</span>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="w-5 h-5 rounded-full bg-emerald-500 text-slate-950 font-black text-xs flex items-center justify-center shrink-0">1</span>
+            <span class="text-slate-200">Tap the <strong>"Install App on Phone"</strong> button above.</span>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="w-5 h-5 rounded-full bg-emerald-500 text-slate-950 font-black text-xs flex items-center justify-center shrink-0">2</span>
+            <span class="text-slate-200">In the prompt dialog, tap <strong>"Install"</strong>.</span>
+          </div>
+          <div class="pt-1 border-t border-white/10 text-[11px] text-slate-300 leading-snug">
+            💡 <strong>To install another copy or update:</strong><br>
+            Tap the button <strong>"Install Another Copy"</strong> above, OR tap Chrome's menu <strong>(3 dots ⋮ in top-right)</strong> and select <strong>"Install app"</strong> (or "Add to Home screen").
+          </div>
+          <div class="pt-1 border-t border-white/10 text-[11px] text-emerald-300 font-semibold">
+            ✓ Installs directly into your phone's App Drawer and Home Screen without any Chrome badge.
+          </div>
+        `;
+      }
     }
+    renderInstructions();
 
     // Capture the native install prompt event
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
       btnInstall.classList.remove('hidden');
-      headerStatus.textContent = 'READY';
+      headerStatus.textContent = 'READY TO INSTALL';
+      headerStatus.className = 'text-[11px] font-mono font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 px-2.5 py-0.5 rounded-full';
       btnInstallText.textContent = 'Install App on Phone Now';
     });
 
@@ -427,29 +421,33 @@
         }
         deferredPrompt = null;
       } else {
-        // Fallback for when beforeinstallprompt has not fired or browser is in a custom state
-        alert('To install Phone App on your mobile device:\n\n1. Tap the 3 dots menu (⋮) in your browser\n2. Select "Install app" (or "Add to Home screen")\n\nThe app will install directly to your phone.');
+        const tryFresh = confirm('To install another copy or update this app:\n\nTap OK to refresh with a new installation session, or tap Cancel and use Chrome menu (3 dots ⋮ ➔ "Install app").');
+        if (tryFresh) {
+          window.location.href = '/install?configId=main&v=' + Date.now();
+        }
       }
     });
 
+    // Install Another Copy / Reinstall Button
+    if (btnFreshInstall) {
+      btnFreshInstall.addEventListener('click', () => {
+        window.location.href = '/install?configId=main&v=' + Date.now();
+      });
+    }
+
     function showInstalledView() {
-      installCard.classList.add('hidden');
-      installedCard.classList.remove('hidden');
-      installedCard.classList.add('flex');
-      headerStatus.textContent = 'INSTALLED';
+      if (installedBanner) {
+        installedBanner.classList.remove('hidden');
+        installedBanner.classList.add('flex');
+      }
+      headerStatus.textContent = 'INSTALLED ✓';
       headerStatus.className = 'text-[11px] font-mono font-bold text-slate-950 bg-emerald-400 px-3 py-0.5 rounded-full shadow-md shadow-emerald-500/30';
+      if (btnInstallText) {
+        btnInstallText.textContent = 'Install App on Phone Again';
+      }
       try {
         localStorage.setItem('fake_call_pwa_installed', 'true');
       } catch (e) { }
-    }
-
-    function showInstallCard() {
-      installedCard.classList.add('hidden');
-      installedCard.classList.remove('flex');
-      installCard.classList.remove('hidden');
-      headerStatus.textContent = 'READY TO INSTALL';
-      headerStatus.className = 'text-[11px] font-mono font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 px-2.5 py-0.5 rounded-full';
-      if (btnInstallText) btnInstallText.textContent = 'Install App on Phone Again';
     }
 
     // Detect when installation finishes
@@ -457,37 +455,8 @@
       showInstalledView();
     });
 
-    // Re-install button click: allows user to reinstall anytime!
-    const btnReinstall = document.getElementById('btn-reinstall');
-    if (btnReinstall) {
-      btnReinstall.addEventListener('click', () => {
-        try {
-          localStorage.removeItem('fake_call_pwa_installed');
-        } catch (e) { }
-        showInstallCard();
-        if (!isIos && deferredPrompt) {
-          btnInstall.click();
-        }
-      });
-    }
-
-    // Version-aware reload:
-    // If a new link version was passed from admin (?v=...), reset installed state so user can reinstall immediately
-    const urlParams = new URLSearchParams(window.location.search);
-    const linkVersion = urlParams.get('v');
-    const storedVersion = localStorage.getItem('fake_call_pwa_version');
-
-    if (linkVersion && linkVersion !== storedVersion) {
-      try {
-        localStorage.removeItem('fake_call_pwa_installed');
-        localStorage.setItem('fake_call_pwa_version', linkVersion);
-      } catch (e) { }
-    }
-
-    // When visiting the page, do NOT lock user into installedCard:
-    // Keep installCard active so they can tap install again, or see instructions!
     if (localStorage.getItem('fake_call_pwa_installed') === 'true') {
-      if (btnInstallText) btnInstallText.textContent = 'Install App on Phone Again';
+      showInstalledView();
     }
   </script>
 

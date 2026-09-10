@@ -187,12 +187,13 @@ export function App() {
       clearTimeout(autoSaveTimeoutRef.current);
       autoSaveTimeoutRef.current = null;
     }
+    let saved = latestConfigRef.current;
     try {
-      await saveConfigCanonical(latestConfigRef.current);
+      saved = await saveConfigCanonical(latestConfigRef.current);
     } catch {
       // proceed if save succeeds or error handled
     }
-    const v = latestConfigRef.current?.version || Date.now();
+    const v = saved?.version || latestConfigRef.current?.version || Date.now();
     return new URL(`/install?configId=main&v=${v}`, window.location.origin).toString();
   };
 

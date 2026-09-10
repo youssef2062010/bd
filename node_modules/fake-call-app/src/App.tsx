@@ -105,6 +105,9 @@ export function App() {
 
     const unsubscribe = configService.subscribe((newConfig) => {
       if (mounted) {
+        try {
+          localStorage.setItem('fakecall_config_cache', JSON.stringify(newConfig));
+        } catch { }
         const previousConfig = configRef.current;
         configRef.current = newConfig;
         setConfig(newConfig);

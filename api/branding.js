@@ -89,7 +89,7 @@ export async function readBranding() {
   try {
     const { data, error } = await supabase
       .from('fakecall_config')
-      .select('branding, updated_at')
+      .select('branding, version, updated_at')
       .eq('id', 'main')
       .maybeSingle();
 
@@ -99,6 +99,7 @@ export async function readBranding() {
         appName: data.branding.appDisplayName || '',
         appIcon: data.branding.appIcon || 'phone-green',
         appIconUrl: iconUrl,
+        version: Number(data.version || 0),
         updatedAt: Number(data.updated_at || Date.now())
       };
       memoryBranding = b;

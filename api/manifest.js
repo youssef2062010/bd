@@ -26,19 +26,21 @@ export default async function handler(req, res) {
   let appName = '';
   let iconSrc = '';
   let iconType = 'image/png';
+  let dbVersion = '';
 
   try {
     if (!supabase) throw new Error('Supabase server configuration is missing');
     const { data, error } = await supabase
       .from('fakecall_config')
-      .select('branding')
+      .select('branding, version, updated_at')
       .eq('id', 'main')
       .maybeSingle();
 
-    if (!error && data?.branding) {
+    if (!error && data) {
+      dbVersion = data.version ? String(data.version) : (data.updated_at ? String(data.updated_at) : '');
       const branding = data.branding;
-      if (branding.appDisplayName?.trim()) appName = branding.appDisplayName.trim();
-      if (branding.customIconUri) {
+      if (branding?.appDisplayName?.trim()) appName = branding.appDisplayName.trim();
+      if (branding?.customIconUri) {
         iconSrc = /^data:image\//i.test(branding.customIconUri) ? '/api/branding/icon' : branding.customIconUri;
         if (/\.jpe?g($|\?)/i.test(branding.customIconUri)) iconType = 'image/jpeg';
         else if (/\.webp($|\?)/i.test(branding.customIconUri)) iconType = 'image/webp';
@@ -47,7 +49,7 @@ export default async function handler(req, res) {
           const match = branding.customIconUri.match(/^data:(image\/(?:png|jpeg|jpg|webp));base64,/i);
           if (match) iconType = match[1].toLowerCase();
         }
-      } else if (branding.appIcon) {
+      } else if (branding?.appIcon) {
         iconSrc = getPresetIcon(branding.appIcon);
         iconType = 'image/svg+xml';
       }
@@ -113,12 +115,16 @@ export default async function handler(req, res) {
         }
       ];
 
+  const v = req.query?.v || req.query?.t || dbVersion || '';
+  const manifestId = v ? `/fake-call-app/?v=${v}` : '/fake-call-app/';
+  const startUrl = v ? `/fake-call-app/index.html?mode=standalone&v=${v}` : '/fake-call-app/index.html?mode=standalone';
+
   return res.status(200).json({
-    id: '/fake-call-app/',
+    id: manifestId,
     name: appName || 'Fake Call',
     short_name: appName || 'Fake Call',
     description: 'Incoming Call Phone Simulator',
-    start_url: '/fake-call-app/index.html?mode=standalone',
+    start_url: startUrl,
     scope: '/',
     display: 'standalone',
     display_override: ['standalone', 'window-controls-overlay'],

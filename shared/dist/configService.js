@@ -23,7 +23,8 @@ class ServerConfigService {
         return `${origin}/api/config${path}`;
     }
     async request(path = '') {
-        return fetch(this.apiUrl(path), {
+        const sep = path.includes('?') ? '&' : '?';
+        return fetch(`${this.apiUrl(path)}${sep}_t=${Date.now()}`, {
             cache: 'no-store',
             headers: { 'Cache-Control': 'no-cache, no-store', Pragma: 'no-cache' }
         });
@@ -82,7 +83,7 @@ class ServerConfigService {
     subscribe(listener) {
         this.listeners.add(listener);
         if (this.poller === null && typeof window !== 'undefined') {
-            this.poller = window.setInterval(() => this.refreshIfNewer(), 5000);
+            this.poller = window.setInterval(() => this.refreshIfNewer(), 2500);
             window.addEventListener('focus', this.refreshIfNewer);
             window.addEventListener('online', this.refreshIfNewer);
             document.addEventListener('visibilitychange', this.onVisibilityChange);
@@ -112,8 +113,9 @@ class ServerConfigService {
         try {
             const before = this.latest;
             const incoming = await this.getConfig(before?.id || 'main');
-            if (!before || incoming.version > before.version)
+            if (!before || incoming.version > before.version || incoming.updatedAt > (before.updatedAt || 0)) {
                 this.publish(incoming);
+            }
         }
         catch {
             // A polling failure must never replace the live UI with defaults.
