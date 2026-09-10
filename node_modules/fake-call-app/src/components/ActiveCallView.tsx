@@ -17,10 +17,10 @@ import { FallingHearts } from './FallingHearts';
 interface ActiveCallViewProps {
   config: FakeCallConfig;
   callStartTime: number;
-  onEndCall: () => void;
+  onEndCall: (finalSeconds?: number) => void;
   onToggleMute: (muted: boolean) => void;
   onToggleSpeaker: (speaker: boolean) => void;
-  voiceProgress: { current: number; total: number };
+  voiceProgress?: { current: number; total: number };
 }
 
 export const ActiveCallView: React.FC<ActiveCallViewProps> = ({
@@ -63,17 +63,17 @@ export const ActiveCallView: React.FC<ActiveCallViewProps> = ({
     };
   }, [isSpeaker]);
 
+  // Robust live in-call timer: counts up continuously every second from mount
   useEffect(() => {
+    const start = callStartTime && callStartTime > 0 ? callStartTime : Date.now();
     const updateElapsedTime = () => {
-      setSeconds(Math.floor((Date.now() - callStartTime) / 1000));
+      setSeconds(Math.max(0, Math.floor((Date.now() - start) / 1000)));
     };
 
     updateElapsedTime();
-    const interval = window.setInterval(() => {
-      updateElapsedTime();
-    }, 1000);
+    const interval = window.setInterval(updateElapsedTime, 500);
     return () => window.clearInterval(interval);
-  }, [callStartTime]);
+  }, []);
 
   const formatTimer = (totalSec: number) => {
     const mins = Math.floor(totalSec / 60);
@@ -329,7 +329,7 @@ export const ActiveCallView: React.FC<ActiveCallViewProps> = ({
               <button
                 id="end-call-btn"
                 type="button"
-                onClick={onEndCall}
+                onClick={() => onEndCall(seconds)}
                 aria-label="End Call"
                 className="w-[74px] h-[74px] sm:w-[78px] sm:h-[78px] rounded-full bg-[#FF3B30] hover:bg-[#E0342B] active:bg-[#D32F2F] active:scale-90 flex items-center justify-center text-white shadow-2xl shadow-red-950/80 transition-transform duration-100 border border-white/15"
               >
@@ -421,7 +421,7 @@ export const ActiveCallView: React.FC<ActiveCallViewProps> = ({
               <button
                 id="end-call-keypad-btn"
                 type="button"
-                onClick={onEndCall}
+                onClick={() => onEndCall(seconds)}
                 aria-label="End Call"
                 className="w-[74px] h-[74px] sm:w-[78px] sm:h-[78px] rounded-full bg-[#FF3B30] hover:bg-[#E0342B] active:bg-[#D32F2F] active:scale-90 flex items-center justify-center text-white shadow-2xl shadow-red-950/80 transition-transform duration-100 border border-white/15"
               >

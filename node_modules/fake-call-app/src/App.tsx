@@ -261,12 +261,14 @@ export function App() {
   };
 
   // End Call Action: Stop playback, show call ended view
-  const handleEndCall = () => {
+  const handleEndCall = (finalSeconds?: number) => {
     clearTimers();
     try { audioPlayerService.stopAll(); } catch { }
     try { hapticService.stop(); } catch { }
 
-    if (activeCallStartTime.current) {
+    if (typeof finalSeconds === 'number' && finalSeconds >= 0) {
+      setCallDuration(finalSeconds);
+    } else if (activeCallStartTime.current) {
       const elapsed = Math.floor((Date.now() - activeCallStartTime.current) / 1000);
       setCallDuration(elapsed);
     }
