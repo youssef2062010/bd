@@ -1,3 +1,4 @@
+import { upload } from '@vercel/blob/client';
 import { VoiceAudioConfig } from '@fakecall/shared';
 
 export interface PresetAvatar {
@@ -72,30 +73,45 @@ class MediaService {
     const adminKey = (import.meta as any).env?.VITE_ADMIN_API_KEY as string | undefined;
     const configuredOrigin = (import.meta as any).env?.VITE_CONFIG_API_ORIGIN as string | undefined;
     const mediaUrl = (configuredOrigin ? configuredOrigin.replace(/\/$/, '') : '') + '/api/media';
+    const ext = mimeType.split('/')[1]?.replace(/[^a-z0-9]/g, '') || 'bin';
+    const fileName = `fakecall/${kind}/${Date.now()}.${ext}`;
     try {
-      const dataUrl = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(String(reader.result || ''));
-        reader.onerror = () => reject(new Error('Could not read media file'));
-        reader.readAsDataURL(normalized);
+      // Use @vercel/blob client upload — file goes directly to Vercel Blob storage
+      // bypassing the 4.5MB serverless function body size limit.
+      const result = await upload(fileName, normalized, {
+        access: 'public',
+        handleUploadUrl: mediaUrl,
+        clientPayload: adminKey ? JSON.stringify({ adminKey }) : undefined,
       });
-      const response = await fetch(mediaUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(adminKey ? { Authorization: 'Bearer ' + adminKey } : {})
-        },
-        body: JSON.stringify({ dataUrl, kind })
-      });
-      const payload = await response.json().catch(() => ({}));
-      if (!response.ok || typeof payload.url !== 'string') {
-        throw new Error(payload.error || `Upload failed (${response.status})`);
+      return result.url;
+    } catch (clientErr) {
+      // Fallback: base64 JSON upload for local dev or small files
+      try {
+        const dataUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(String(reader.result || ''));
+          reader.onerror = () => reject(new Error('Could not read media file'));
+          reader.readAsDataURL(normalized);
+        });
+        const response = await fetch(mediaUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(adminKey ? { Authorization: 'Bearer ' + adminKey } : {})
+          },
+          body: JSON.stringify({ dataUrl, kind })
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok || typeof payload.url !== 'string') {
+          throw new Error(payload.error || `Upload failed (${response.status})`);
+        }
+        return payload.url;
+      } catch {
+        throw new Error('Upload failed. Check your connection and try again. The previous file has been kept.');
       }
-      return payload.url;
-    } catch {
-      throw new Error('Upload failed. Check your connection and try again. The previous file has been kept.');
     }
   }
+
   public async processAudioFile(file: File): Promise<VoiceAudioConfig> {
     return this.track(async () => {
       const uri = await this.uploadBlob(file, 'voice');

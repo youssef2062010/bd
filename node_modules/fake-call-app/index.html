@@ -11,6 +11,22 @@
   <meta name="apple-mobile-web-app-title" content="Fake Call" />
   <meta name="theme-color" content="#000000" />
   <title>Fake Call</title>
+  <script>
+    (function () {
+      var isStandalone =
+        window.matchMedia('(display-mode: standalone)').matches ||
+        window.matchMedia('(display-mode: fullscreen)').matches ||
+        window.navigator.standalone === true;
+
+      var params = new URLSearchParams(window.location.search);
+      var isAllowed = params.get('preview') === 'admin' || window.self !== window.top;
+
+      if (!isStandalone && !isAllowed) {
+        var configId = params.get('configId') || 'main';
+        window.location.replace('/install?configId=' + encodeURIComponent(configId));
+      }
+    })();
+  </script>
   <link rel="manifest" href="/api/manifest" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
