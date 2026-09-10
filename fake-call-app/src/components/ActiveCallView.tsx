@@ -13,6 +13,7 @@ import {
 import { PhoneDeclineGlyph } from './PhoneGlyphs';
 import { StatusBar } from './StatusBar';
 import { FallingHearts } from './FallingHearts';
+import { AnswerHeartBurst } from './AnswerHeartBurst';
 
 interface ActiveCallViewProps {
   config: FakeCallConfig;
@@ -159,7 +160,10 @@ export const ActiveCallView: React.FC<ActiveCallViewProps> = ({
           }`}
       />
 
-      {/* Red & Pink Falling Hearts Shower */}
+      {/* Immediate Explosive Answer Heart Burst upon answering call */}
+      <AnswerHeartBurst />
+
+      {/* Red & Pink Romantic Floating Hearts Shower */}
       {showHearts && <FallingHearts />}
 
       {/* Feedback Toast for Mute & Speaker */}

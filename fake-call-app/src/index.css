@@ -72,6 +72,64 @@ body, html, #root {
   }
 }
 
+@keyframes answerHeartBurst {
+  0% {
+    transform: translate(0, 0) scale(0.2) rotate(0deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+    transform: translate(calc(var(--burst-end-x, 0px) * 0.3), calc(var(--burst-end-y, -100px) * 0.3)) scale(1.3) rotate(15deg);
+  }
+  50% {
+    opacity: 0.95;
+    transform: translate(calc(var(--burst-end-x, 0px) * 0.7), calc(var(--burst-end-y, -100px) * 0.7)) scale(1.1) rotate(-10deg);
+  }
+  85% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(var(--burst-end-x, 0px), var(--burst-end-y, -100px)) scale(0.7) rotate(25deg);
+    opacity: 0;
+  }
+}
+
+@keyframes floatingHeartRise {
+  0% {
+    transform: translateY(105vh) translateX(0) scale(0.7) rotate(0deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.95;
+  }
+  50% {
+    transform: translateY(50vh) translateX(25px) scale(1.1) rotate(18deg);
+    opacity: 0.9;
+  }
+  85% {
+    opacity: 0.75;
+  }
+  100% {
+    transform: translateY(-30px) translateX(-20px) scale(0.75) rotate(-22deg);
+    opacity: 0;
+  }
+}
+
+@keyframes tapHeartFloat {
+  0% {
+    transform: translate(-50%, -50%) scale(0.3);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(calc(-50% + var(--tap-offset-x, 0px)), -110px) scale(1.2);
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate(calc(-50% + var(--tap-offset-x, 0px)), -200px) scale(0.6);
+    opacity: 0;
+  }
+}
+
 /* Custom scrollbars */
 ::-webkit-scrollbar {
   width: 6px;

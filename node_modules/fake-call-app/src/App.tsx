@@ -232,6 +232,7 @@ export function App() {
     clearTimers();
     try { audioPlayerService.stopRingtone(); } catch { }
     try { hapticService.stop(); } catch { }
+    try { if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate([40, 60, 40]); } catch { }
     setVoiceProgress({ current: 0, total: 0 });
     setCallState('active');
     activeCallStartTime.current = Date.now();

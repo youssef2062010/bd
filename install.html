@@ -236,7 +236,7 @@
         </div>
       </div>
 
-      <!-- Native Install Button -->
+      <!-- 1. Native / Primary Install Button -->
       <button id="btn-install" type="button"
         class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 active:scale-95 text-slate-950 font-black text-base shadow-xl shadow-emerald-500/35 transition-all flex items-center justify-center gap-2.5">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -246,14 +246,38 @@
         <span id="btn-install-text">Install App on Phone</span>
       </button>
 
-      <!-- Reinstall / Install Another Copy Button (Generates fresh session for repeated installs) -->
-      <button id="btn-fresh-install" type="button"
-        class="w-full py-3 px-4 rounded-xl bg-slate-800/90 hover:bg-slate-700/90 active:scale-95 text-slate-200 hover:text-white border border-white/10 font-bold text-xs transition-all flex items-center justify-center gap-2 shadow-md">
-        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-        </svg>
-        <span id="btn-fresh-text">Install Another Copy (New Shortcut)</span>
+      <!-- 2. Download / Install App Again Button (تنزيل الأب مرة تانية) -->
+      <button id="btn-download-again" type="button"
+        class="w-full py-3.5 px-4 rounded-xl bg-slate-800/90 hover:bg-slate-700/90 active:scale-95 text-slate-100 hover:text-white border border-emerald-500/30 font-bold text-xs sm:text-sm transition-all flex flex-col items-center justify-center gap-0.5 shadow-md">
+        <div class="flex items-center gap-2">
+          <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          <span id="btn-download-again-text" class="text-white font-extrabold">Download / Install App Again</span>
+        </div>
+        <span class="text-[10px] text-emerald-400/90 font-medium font-sans">تنزيل وتثبيت نسخة جديدة من الأب على الهاتف</span>
       </button>
+
+      <!-- 3. Update Installed App With Latest Changes Button (تحديث الأب الحالي بالتعديلات الجديدة) -->
+      <button id="btn-update-app" type="button"
+        class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-cyan-600/90 via-blue-600/90 to-indigo-600/90 hover:from-cyan-500 hover:to-indigo-500 active:scale-95 text-white font-bold text-xs sm:text-sm transition-all flex flex-col items-center justify-center gap-0.5 shadow-lg shadow-cyan-950/40 border border-cyan-400/30">
+        <div class="flex items-center gap-2">
+          <svg id="update-spinner" class="w-4 h-4 text-cyan-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          <span id="btn-update-text" class="font-black text-white">Update Installed App with Latest Changes</span>
+        </div>
+        <span class="text-[10px] text-cyan-200/90 font-medium font-sans">تحديث الأب الحالي المثبت بآخر التعديلات فوراً</span>
+      </button>
+
+      <!-- Update Success Toast Banner -->
+      <div id="update-success-banner" class="hidden w-full bg-emerald-950/90 border border-emerald-400/50 rounded-xl p-3 text-left items-center gap-2.5 pop-in">
+        <div class="w-8 h-8 rounded-lg bg-emerald-500 text-slate-950 flex items-center justify-center shrink-0 font-black text-base">✓</div>
+        <div class="flex-1 min-w-0">
+          <div class="text-xs font-bold text-white">App Updated Successfully!</div>
+          <div class="text-[10px] text-emerald-200 leading-tight">All latest caller details, audio, and settings synced to your phone.</div>
+        </div>
+      </div>
 
       <!-- Step-by-Step Instructions Box -->
       <div id="instructions-box"
@@ -295,7 +319,11 @@
     const installedBanner = document.getElementById('installed-banner');
     const btnInstall = document.getElementById('btn-install');
     const btnInstallText = document.getElementById('btn-install-text');
-    const btnFreshInstall = document.getElementById('btn-fresh-install');
+    const btnDownloadAgain = document.getElementById('btn-download-again');
+    const btnUpdateApp = document.getElementById('btn-update-app');
+    const btnUpdateText = document.getElementById('btn-update-text');
+    const updateSpinner = document.getElementById('update-spinner');
+    const updateSuccessBanner = document.getElementById('update-success-banner');
     const headerStatus = document.getElementById('header-status');
     const instructionsBox = document.getElementById('instructions-box');
     const appTitle = document.getElementById('app-title');
@@ -353,7 +381,6 @@
     function renderInstructions() {
       if (isIos) {
         btnInstall.classList.add('hidden'); // iOS Safari requires Share -> Add to Home Screen
-        if (btnFreshInstall) btnFreshInstall.classList.add('hidden');
         instructionsBox.innerHTML = `
           <div class="font-bold text-white flex items-center gap-1.5 pb-1 border-b border-white/10">
             <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
@@ -372,7 +399,7 @@
             <span class="text-slate-200">Tap <strong class="text-white">"Add"</strong> in the top-right corner.</span>
           </div>
           <div class="pt-1.5 border-t border-white/10 text-[11px] text-emerald-300 font-semibold">
-            ✓ You can repeat these 3 steps anytime to add more app icons to your Home Screen!
+            ✓ You can repeat these 3 steps anytime to download more app icons to your Home Screen!
           </div>
         `;
       } else {
@@ -390,11 +417,8 @@
             <span class="text-slate-200">In the prompt dialog, tap <strong>"Install"</strong>.</span>
           </div>
           <div class="pt-1 border-t border-white/10 text-[11px] text-slate-300 leading-snug">
-            💡 <strong>To install another copy or update:</strong><br>
-            Tap the button <strong>"Install Another Copy"</strong> above, OR tap Chrome's menu <strong>(3 dots ⋮ in top-right)</strong> and select <strong>"Install app"</strong> (or "Add to Home screen").
-          </div>
-          <div class="pt-1 border-t border-white/10 text-[11px] text-emerald-300 font-semibold">
-            ✓ Installs directly into your phone's App Drawer and Home Screen without any Chrome badge.
+            💡 <strong>To install another copy:</strong> Tap <strong>"Download / Install App Again"</strong> above.<br>
+            💡 <strong>To update without reinstalling:</strong> Tap <strong>"Update Installed App with Latest Changes"</strong> above.
           </div>
         `;
       }
@@ -411,7 +435,7 @@
       btnInstallText.textContent = 'Install App on Phone Now';
     });
 
-    // Tap Install Button
+    // 1. Tap Primary Install Button
     btnInstall.addEventListener('click', async () => {
       if (deferredPrompt) {
         deferredPrompt.prompt();
@@ -421,17 +445,101 @@
         }
         deferredPrompt = null;
       } else {
-        const tryFresh = confirm('To install another copy or update this app:\n\nTap OK to refresh with a new installation session, or tap Cancel and use Chrome menu (3 dots ⋮ ➔ "Install app").');
-        if (tryFresh) {
-          window.location.href = '/install?configId=main&v=' + Date.now();
-        }
+        window.location.href = '/install?configId=main&v=' + Date.now();
       }
     });
 
-    // Install Another Copy / Reinstall Button
-    if (btnFreshInstall) {
-      btnFreshInstall.addEventListener('click', () => {
-        window.location.href = '/install?configId=main&v=' + Date.now();
+    // 2. Download / Install App Again Button (تنزيل الأب مرة تانية)
+    if (btnDownloadAgain) {
+      btnDownloadAgain.addEventListener('click', async () => {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          const { outcome } = await deferredPrompt.userChoice;
+          if (outcome === 'accepted') {
+            showInstalledView();
+          }
+          deferredPrompt = null;
+        } else {
+          window.location.href = '/install?configId=main&v=' + Date.now();
+        }
+      });
+    }
+
+    // 3. Update Installed App With Latest Changes (تحديث الأب الحالي بآخر التعديلات)
+    let isAppUpdated = false;
+    if (btnUpdateApp) {
+      btnUpdateApp.addEventListener('click', async () => {
+        if (isAppUpdated) {
+          // If already updated, open the updated app directly
+          window.location.href = '/fake-call-app/index.html?mode=standalone';
+          return;
+        }
+
+        try {
+          if (updateSpinner) updateSpinner.classList.add('animate-spin');
+          if (btnUpdateText) btnUpdateText.textContent = 'Updating App & Syncing Latest Data...';
+
+          // Step A: Trigger Service Worker check & purge outdated caches
+          if ('serviceWorker' in navigator) {
+            try {
+              const regs = await navigator.serviceWorker.getRegistrations();
+              await Promise.all(regs.map((r) => r.update()));
+              if (navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage({ type: 'PURGE_CACHE' });
+                navigator.serviceWorker.controller.postMessage({ type: 'SKIP_WAITING' });
+              }
+            } catch (swErr) {
+              console.warn('SW update trigger notice:', swErr);
+            }
+          }
+
+          // Step B: Purge all browser caches
+          if ('caches' in window) {
+            try {
+              const keys = await caches.keys();
+              await Promise.all(keys.map((k) => caches.delete(k)));
+            } catch (cErr) {
+              console.warn('Cache purge notice:', cErr);
+            }
+          }
+
+          // Step C: Fetch fresh server configuration and write to localStorage cache
+          const cfgRes = await fetch('/api/config?_t=' + Date.now(), { cache: 'no-store' });
+          const cfgData = await cfgRes.json();
+          if (cfgData?.config) {
+            try {
+              localStorage.setItem('fakecall_config_cache', JSON.stringify(cfgData.config));
+            } catch {}
+          }
+
+          // Step D: Fetch fresh branding and update
+          const brandRes = await fetch('/api/branding?_t=' + Date.now(), { cache: 'no-store' });
+          const brandData = await brandRes.json();
+          if (brandData) {
+            try {
+              localStorage.setItem('app_branding_cache', JSON.stringify(brandData));
+            } catch {}
+            applyBranding(brandData);
+          }
+
+          // Step E: Update UI to success state
+          if (updateSpinner) updateSpinner.classList.remove('animate-spin');
+          if (updateSuccessBanner) {
+            updateSuccessBanner.classList.remove('hidden');
+            updateSuccessBanner.classList.add('flex');
+          }
+          if (btnUpdateText) {
+            btnUpdateText.textContent = '✓ Updated! Tap to Open Updated App Now';
+          }
+          isAppUpdated = true;
+          headerStatus.textContent = 'UPDATED ✓';
+          headerStatus.className = 'text-[11px] font-mono font-bold text-slate-950 bg-cyan-400 px-3 py-0.5 rounded-full shadow-md shadow-cyan-500/30';
+        } catch (err) {
+          console.error('Update failed:', err);
+          if (updateSpinner) updateSpinner.classList.remove('animate-spin');
+          if (btnUpdateText) btnUpdateText.textContent = 'Retry Updating App';
+          alert('Could not sync latest changes. Check internet connection and try again.');
+        }
       });
     }
 
