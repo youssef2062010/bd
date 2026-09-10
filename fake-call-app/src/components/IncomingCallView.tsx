@@ -48,9 +48,9 @@ export const IncomingCallView: React.FC<IncomingCallViewProps> = ({
 
       {/* Top Caller Information (Authentic iOS / Android Style) */}
       <div className="relative z-10 flex flex-col items-center text-center mt-6 sm:mt-10 px-6 w-full">
-        <div className="flex items-center gap-1.5 text-xs sm:text-sm font-medium tracking-wide text-rose-200/90">
+        <div className="flex items-center gap-1.5 text-xs sm:text-sm font-bold tracking-wide text-rose-200/95">
           {isRomantic && <Heart className="w-3.5 h-3.5 fill-rose-400 text-rose-400 animate-pulse" />}
-          <span>mobile</span>
+          <span id="app-display-label">{config.branding?.appDisplayName || 'mobile'}</span>
         </div>
         <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-white mt-1 drop-shadow-lg">
           {config.callerName || 'Incoming Call'}

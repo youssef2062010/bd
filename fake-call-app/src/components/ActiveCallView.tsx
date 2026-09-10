@@ -186,6 +186,11 @@ export const ActiveCallView: React.FC<ActiveCallViewProps> = ({
         <>
           {/* Caller Details & Live Real Call Timer */}
           <div className="relative z-10 flex flex-col items-center text-center mt-6 sm:mt-8 px-6 w-full animate-fade-in">
+            {config.branding?.appDisplayName && (
+              <span className="text-[11px] font-bold text-rose-300/90 tracking-wider uppercase mb-1 px-2.5 py-0.5 rounded-full bg-white/10 backdrop-blur-md border border-white/10">
+                {config.branding.appDisplayName}
+              </span>
+            )}
             <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-white drop-shadow-md">
               {config.callerName || 'Call in Progress'}
             </h1>
